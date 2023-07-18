@@ -1,0 +1,52 @@
+{
+	"name": "the-next-gen-show",
+	"version": "1.0.0",
+	"description": "",
+	"main": "app.js",
+	"scripts": {
+		"test": "echo \"Error: no test specified\" && exit 1",
+		"build": "npx tsc",
+		"start": "node dist/app.js",
+		"start:dev": "nodemon"
+	},
+	"keywords": [],
+	"author": "",
+	"license": "ISC",
+	"dependencies": {
+		"bcryptjs": "^2.4.3",
+		"cors": "^2.8.5",
+		"debug": "^4.3.4",
+		"dotenv": "^16.3.1",
+		"express": "^4.18.2",
+		"express-async-errors": "^3.1.1",
+		"fs": "^0.0.1-security",
+		"googleapis": "^122.0.0",
+		"helmet": "^7.0.0",
+		"http": "^0.0.1-security",
+		"ioredis": "^5.3.2",
+		"joi": "^17.9.2",
+		"joi-objectid": "^4.0.2",
+		"jsonwebtoken": "^9.0.1",
+		"lodash": "^4.17.21",
+		"mongoose": "^7.3.2",
+		"mongoose-aggregate-paginate-v2": "^1.0.6",
+		"mongoose-paginate-v2": "^1.7.1",
+		"mustache": "^4.2.0",
+		"nodemailer": "^6.9.3",
+		"path": "^0.12.7",
+		"typescript": "^5.1.6",
+		"winston": "^3.9.0"
+	},
+	"devDependencies": {
+		"@types/bcryptjs": "^2.4.2",
+		"@types/cors": "^2.8.13",
+		"@types/debug": "^4.1.8",
+		"@types/express": "^4.17.17",
+		"@types/jsonwebtoken": "^9.0.2",
+		"@types/lodash": "^4.14.195",
+		"@types/mustache": "^4.2.2",
+		"@types/nodemailer": "^6.4.8",
+		"nodemon": "^3.0.1",
+		"ts-node": "^10.9.1"
+	}
+}

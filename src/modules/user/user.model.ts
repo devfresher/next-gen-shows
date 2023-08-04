@@ -1,12 +1,15 @@
-import mongoose from "mongoose"
-import paginate from "mongoose-paginate-v2"
-import { User } from "../../types/user"
+import mongoose from 'mongoose';
+import paginate from 'mongoose-paginate-v2';
+import { User } from '../../types/user';
 
 const userSchema = new mongoose.Schema({
 	firstName: {
 		type: String,
 	},
 	lastName: {
+		type: String,
+	},
+	fullName: {
 		type: String,
 	},
 	stageName: {
@@ -21,7 +24,6 @@ const userSchema = new mongoose.Schema({
 	},
 	password: {
 		type: String,
-		required: true,
 	},
 	isActive: {
 		type: Boolean,
@@ -32,6 +34,8 @@ const userSchema = new mongoose.Schema({
 		default: false,
 	},
 	isAdmin: { type: Boolean, default: false },
+	isVoter: { type: Boolean, default: false },
+	reason: String,
 	phoneNumber: String,
 	passwordReset: {
 		type: {
@@ -48,8 +52,12 @@ const userSchema = new mongoose.Schema({
 		},
 	},
 	createdAt: { type: Date, default: Date.now },
-})
+});
 
-userSchema.plugin(paginate)
-const UserModel = mongoose.model<User>("User", userSchema)
-export default UserModel
+userSchema.plugin(paginate);
+userSchema.pre('save', function (next) {
+	this.fullName = `${this.firstName || ''} ${this.lastName || ''}`.trim();
+	next();
+});
+const UserModel = mongoose.model<User>('User', userSchema);
+export default UserModel;

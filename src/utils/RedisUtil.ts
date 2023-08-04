@@ -2,7 +2,7 @@ import { Redis, RedisOptions } from "ioredis"
 import { config } from "./config"
 import { SystemError } from "../errors"
 
-class RedisService {
+class RedisUtil {
 	private redis: Redis
 
 	constructor(host: string, port: number) {        
@@ -27,4 +27,4 @@ class RedisService {
 	}
 }
 
-export default new RedisService(config.REDIS_HOST, config.REDIS_PORT)
+export default new RedisUtil(config.REDIS_HOST, config.REDIS_PORT)

@@ -1,6 +1,9 @@
 {
     "cSpell.words": [
+        "cloudinary",
+        "PAYSTACK",
         "sadd",
+        "SENDGRID",
         "sismember"
     ]
 }

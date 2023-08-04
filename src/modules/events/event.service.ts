@@ -4,7 +4,7 @@ import { CreateEventInput, Event, UpdateEventInput } from "../../types/event"
 import { FilterQuery, PageFilter } from "../../types/general"
 import EventModel from "./event.model"
 import { PaginateOptions, PaginateResult } from "mongoose"
-import { paginationLabel } from "../../utils/pagination"
+import Pagination from "../../utils/PaginationUtil"
 
 export default class EventService {
 	private static model = EventModel
@@ -22,7 +22,7 @@ export default class EventService {
 		const paginate = !(!page || !limit)
 
 		const paginateOption: PaginateOptions = {
-			customLabels: paginationLabel,
+			customLabels: Pagination.label,
 			sort: { createdAt: -1 },
 			page,
 			limit,

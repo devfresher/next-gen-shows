@@ -2,11 +2,9 @@ import { FilterQuery } from "../../types/general"
 import { CreateUserInput, UpdateUserInput, User } from "../../types/user"
 import UserModel from "./user.model"
 import AuthService from "../auth/auth.service"
-import { AuthToken } from "../../types/auth"
 import { ConflictError, NotFoundError } from "../../errors"
 import { sendEmail } from "../mailer/EmailService"
 import { config } from "../../utils/config"
-import RedisService from "../../utils/RedisService"
 
 export default class UserService {
 	static model = UserModel
@@ -33,7 +31,7 @@ export default class UserService {
 		await newUser.save()
 
 		user = await this.getOne({ email })
-		const activationToken = await AuthService.generateAuthToken(user)		
+		const activationToken = await AuthService.generateAuthToken(user)
 		const activationLink = `${config.BASE_URL}/activate/${activationToken.token}`
 		sendEmail({
 			recipientEmail: email,
@@ -47,8 +45,16 @@ export default class UserService {
 	}
 
 	static async updateUser(userId: string, userData: UpdateUserInput): Promise<User> {
-		const { firstName, lastName, stageName, emailVerified, phoneNumber, portfolio, talent } =
-			userData
+		const {
+			firstName,
+			lastName,
+			stageName,
+			emailVerified,
+			phoneNumber,
+			portfolio,
+			talent,
+			reason,
+		} = userData
 
 		let user = await this.getOne({ _id: userId })
 		if (!user) throw new NotFoundError("User not found")
@@ -63,9 +69,17 @@ export default class UserService {
 				phoneNumber,
 				portfolio,
 				talent,
+				reason,
 			}
 		)
 		user = await this.getOne({ _id: userId })
 		return user
+	}
+
+	public static async profileCompleted(userId: string): Promise<boolean> {
+		const user = await this.getOne({ _id: userId })
+		if (user?.fullName && user?.email && user?.phoneNumber && user?.portfolio) return true
+
+		return false
 	}
 }

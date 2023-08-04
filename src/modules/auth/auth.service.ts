@@ -6,7 +6,7 @@ import { AuthToken, LoginData } from "../../types/auth"
 import UserService from "../user/user.service"
 import { BadRequestError, ForbiddenError, UnauthorizedError } from "../../errors"
 import { CustomJWTPayload } from "../../types/general"
-import RedisService from "../../utils/RedisService"
+import RedisUtil from "../../utils/RedisUtil"
 import { isLeftHandSideExpression } from "typescript"
 
 export default class AuthService {
@@ -33,7 +33,7 @@ export default class AuthService {
 	static async activateUser(activationToken: string): Promise<User> {
 		if (!activationToken) throw new BadRequestError("No activation token provided", "web")
 
-		const isRevoked = await RedisService.isTokenRevoked(activationToken)
+		const isRevoked = await RedisUtil.isTokenRevoked(activationToken)
 		if (isRevoked) throw new UnauthorizedError("You are using a revoked token", "web")
 
 		const decodedToken = jwt.verify(activationToken, config.JWT_PRIVATE_KEY) as CustomJWTPayload
@@ -42,10 +42,10 @@ export default class AuthService {
 		})
 		if (!user) throw new UnauthorizedError("Invalid auth token", "web")
 
-		user = await UserService.updateUser(user._id, {
+		user = await UserService.updateUser(user._id.toString(), {
 			emailVerified: true,
 		})
-		await RedisService.addToRevokedTokens(activationToken)
+		await RedisUtil.addToRevokedTokens(activationToken)
 		return user
 	}
 

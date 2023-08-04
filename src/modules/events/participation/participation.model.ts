@@ -1,9 +1,10 @@
-import mongoose, { Types } from "mongoose"
-import { Participation } from "../../../types/participation"
+import mongoose, { PaginateModel, Types } from 'mongoose';
+import { Participation } from '../../../types/participation';
+import paginate from 'mongoose-paginate-v2';
 
 const ParticipationSchema = new mongoose.Schema({
-	user: { type: Types.ObjectId, ref: "User", required: true },
-	event: { type: Types.ObjectId, ref: "Event", required: true },
+	user: { type: Types.ObjectId, ref: 'User', required: true },
+	event: { type: Types.ObjectId, ref: 'Event', required: true },
 	registeredData: { type: Object },
 	multimedia: {
 		type: {
@@ -12,8 +13,11 @@ const ParticipationSchema = new mongoose.Schema({
 			_id: false,
 		},
 	},
+	paymentRef: { type: String },
 	createdAt: { type: Date, default: Date.now },
-})
+});
+interface ParticipationModel extends PaginateModel<Participation, Document> {}
 
-const ParticipationModel = mongoose.model<Participation>("Participation", ParticipationSchema)
-export default ParticipationModel
+ParticipationSchema.plugin(paginate);
+const ParticipationModel = mongoose.model<Participation, ParticipationModel>('Participation', ParticipationSchema);
+export default ParticipationModel;

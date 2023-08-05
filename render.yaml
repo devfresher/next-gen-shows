@@ -1,6 +1,9 @@
 services:
     - name: The Next Gen Show
       type: web
+      runtime: docker
+      dockerfilePath: Dockerfile
+      dockerContext: .
       plan: free
       startCommand: npm run start
       buildCommand: npm run build

@@ -5,5 +5,3 @@ services:
       dockerfilePath: Dockerfile
       dockerContext: .
       plan: free
-      startCommand: npm run start
-      buildCommand: npm run build

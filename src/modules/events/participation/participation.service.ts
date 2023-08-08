@@ -145,7 +145,7 @@ export default class ParticipationService {
 
 		const participantPromise = participationData.map(async (participation) => {
 			const { user } = participation;
-			const participant = user.toObject();
+			const participant = user;
 
 			const participantId = participant._id;
 			const votes = await this.countParticipantVotes(participantId, eventId);

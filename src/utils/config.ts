@@ -17,6 +17,7 @@ export const config = {
 
 	REDIS_HOST: process.env.REDIS_HOST,
 	REDIS_PORT: Number(process.env.REDIS_PORT),
+	REDIS_URL: process.env.REDIS_URL,
 
 	NODE_ENV: process.env.NODE_ENV,
 	DEBUG: debug('dev'),

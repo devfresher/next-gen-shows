@@ -7,7 +7,6 @@ import UserService from "../user/user.service"
 import { BadRequestError, ForbiddenError, UnauthorizedError } from "../../errors"
 import { CustomJWTPayload } from "../../types/general"
 import RedisUtil from "../../utils/RedisUtil"
-import { isLeftHandSideExpression } from "typescript"
 
 export default class AuthService {
 	static async login(loginData: LoginData) {

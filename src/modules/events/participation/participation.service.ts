@@ -11,12 +11,10 @@ import ParticipationModel from './participation.model';
 import { MetaData as ParticipationData } from '../../../types/participation';
 import PaystackUtil from '../../../utils/PaystackUtil';
 import { config } from '../../../utils/config';
-import { User } from '../../../types/user';
+import { ParticipantWithVotes, User } from '../../../types/user';
 import { PaginateResult } from 'mongoose';
 import { PaginateOptions } from 'mongoose';
 import Pagination from '../../../utils/PaginationUtil';
-import { log } from 'winston';
-import { datafusion_v1beta1 } from 'googleapis';
 import VotingService from '../voting/voting.service';
 import { Voting } from '../../../types/voting';
 
@@ -138,25 +136,25 @@ export default class ParticipationService {
 	public static async getAllEventParticipants(
 		eventId: string,
 		pageFilter: PageFilter
-	): Promise<User[]> {
+	): Promise<any> {
 		const event = await EventService.getOne({ _id: eventId });
 		if (!event) throw new NotFoundError('Event not found');
 
-		const participationData = await this.getForService({ event: eventId });
-		console.log(participationData);
+		const { data, paging } = await this.getMany({ event: eventId }, pageFilter);
+		const participationData = data as Participation[];
 
-		const participantPromise = participationData.map(async (participation: Participation) => {
-			const participantId = participation.user._id.toString();
-			const voteCount = await this.countParticipantVotes(participantId, eventId);
-			const participant = {
-				...participation.user,
-				votes: voteCount,
-			};
-			return participant;
+		const participantPromise = participationData.map(async (participation) => {
+			const { user } = participation;
+			const participant = user.toObject();
+
+			const participantId = participant._id;
+			const votes = await this.countParticipantVotes(participantId, eventId);
+			return { ...participant, votes };
 		});
-		
+
 		const participants = await Promise.all(participantPromise);
-		return participants;
+
+		return { data: participants, paging };
 	}
 
 	public static async countParticipantVotes(

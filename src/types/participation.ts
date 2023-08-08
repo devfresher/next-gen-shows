@@ -1,4 +1,4 @@
-import { Document } from 'mongoose';
+import { Document, Types } from 'mongoose';
 import { Event } from './event';
 import { User } from './user';
 

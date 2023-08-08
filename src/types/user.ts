@@ -1,7 +1,6 @@
 import { Document, Types } from 'mongoose';
 
-export interface User {
-	_id?: Types.ObjectId;
+export interface User extends Document {
 	firstName?: string;
 	lastName?: string;
 	fullName?: string;
@@ -50,4 +49,8 @@ export interface Voter {
 	fullName?: string;
 	email: string;
 	phoneNumber?: string;
+}
+
+export interface ParticipantWithVotes extends User {
+	votes: number;
 }

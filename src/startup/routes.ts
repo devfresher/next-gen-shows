@@ -6,6 +6,7 @@ import helmet from 'helmet';
 import authRouter from '../modules/auth/routes';
 import userRouter from '../modules/user/routes';
 import eventRouter from '../modules/events/routes';
+import otherRouter from '../modules/others/routes';
 import webRouter from '../modules/web/routes';
 
 import ResponseMiddleware from '../middleware/response';
@@ -30,6 +31,7 @@ const routeApp = function (app: Express) {
 };
 
 const apiRoutes = (router: Router) => {
+	router.use('/', otherRouter);
 	router.use('/auth', authRouter);
 	router.use('/user', userRouter);
 	router.use('/events', eventRouter);

@@ -7,10 +7,14 @@ import { EmailData } from "../../types/emails"
 
 const templateSubjectMatch = {
 	welcome: {
-		subject: "Welcome to The Next Gen Show",
-		file: "welcome.html",
+		subject: 'Welcome to The Next Gen Show',
+		file: 'welcome.html',
 	},
-}
+	customer_contact: {
+		subject: 'New Contact Form Submission',
+		file: 'customer_contact.html',
+	},
+};
 
 export async function sendEmail(data: EmailData) {
 	let { templateName, recipientEmail, templateData } = data

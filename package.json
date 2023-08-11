@@ -2,12 +2,13 @@
 	"name": "the-next-gen-show",
 	"version": "1.0.0",
 	"description": "",
-	"main": "app.js",
+	"main": "app.ts",
 	"scripts": {
 		"test": "echo \"Error: no test specified\" && exit 1",
 		"build": "tsc",
-		"start": "NODE_ENV=production node dist/app.js",
-		"start:dev": "nodemon"
+		"lint": "eslint . --ext .ts",
+		"start": "node dist/app.js",
+		"dev": "cross-env NODE_ENV=development tsnd --respawn src/app.ts"
 	},
 	"keywords": [],
 	"author": "",
@@ -38,7 +39,6 @@
 		"nodemailer": "^6.9.3",
 		"path": "^0.12.7",
 		"paystack-sdk": "^2.5.7",
-		"ts-node": "^10.9.1",
 		"typescript": "^5.1.6",
 		"winston": "^3.9.0"
 	},
@@ -52,6 +52,9 @@
 		"@types/multer": "^1.4.7",
 		"@types/mustache": "^4.2.2",
 		"@types/nodemailer": "^6.4.8",
-		"nodemon": "^3.0.1"
+		"nodemon": "^3.0.1",
+		"ts-node-dev": "^2.0.0",
+		"cross-env": "^7.0.3",
+		"ts-node": "^10.9.1"
 	}
 }

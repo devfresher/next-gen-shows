@@ -1,4 +1,5 @@
 import { Request } from 'express';
+import { JwtPayload } from 'jsonwebtoken';
 
 declare global {
 	namespace Express {
@@ -8,3 +9,8 @@ declare global {
 		}
 	}
 }
+
+type CustomJwtPayload = JwtPayload & {
+	_id: string;
+	isAdmin: boolean;
+};

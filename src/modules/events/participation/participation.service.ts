@@ -144,12 +144,14 @@ export default class ParticipationService {
 		const participationData = data as Participation[];
 
 		const participantPromise = participationData.map(async (participation) => {
-			const { user } = participation;
-			const participant = user;
+			const { user: participant } = participation;
 
-			const participantId = participant._id;
-			const votes = await this.countParticipantVotes(participantId, eventId);
-			return { ...participant, votes };
+			if (participant) {
+				const participantId = participant?._id;
+				const votes = await this.countParticipantVotes(participantId, eventId);
+				return { ...participant.toObject(), votes };
+			}
+			return;
 		});
 
 		const participants = await Promise.all(participantPromise);

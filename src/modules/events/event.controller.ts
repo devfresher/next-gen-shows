@@ -1,7 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
 import EventService from './event.service';
-import { CustomRequest, FilterQuery, PageFilter } from '../../types/general';
-import ParticipationService from './participation/participation.service';
+import { FilterQuery, PageFilter } from '../../types/general';
 
 export default class EventController {
 	static async createEvent(req: Request, res: Response, next: NextFunction) {
@@ -52,10 +51,25 @@ export default class EventController {
 			let filterQuery: FilterQuery = {};
 			const pageFilter: PageFilter = { page: Number(page), limit: Number(limit) };
 
-			const eventResult = await EventService.getMany(filterQuery, pageFilter);
+			const events = await EventService.getMany(filterQuery, pageFilter);
+			res.status(200).json({
+				message: 'Events retrieved successfully',
+				...events,
+			});
+		} catch (error) {
+			next(error);
+		}
+	}
+
+	static async getOne(req: Request, res: Response, next: NextFunction) {
+		try {
+			const { eventId } = req.params;
+			let filterQuery: FilterQuery = { _id: eventId };
+
+			const event = await EventService.getOne(filterQuery);
 			res.status(200).json({
 				message: 'Event retrieved successfully',
-				...eventResult,
+				...event.toObject(),
 			});
 		} catch (error) {
 			next(error);

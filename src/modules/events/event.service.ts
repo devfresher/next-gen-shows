@@ -35,7 +35,15 @@ export default class EventService {
 	}
 
 	public static async create(eventData: CreateEventInput): Promise<Event> {
-		const { eventName, description, categories, eventCover, eventVideo } = eventData;
+		const {
+			eventName,
+			description,
+			categories,
+			eventCover,
+			eventVideo,
+			contestStart,
+			contestEnd,
+		} = eventData;
 		const label = helperUtil.getLabel(eventName);
 
 		await this.checkLabel(label);
@@ -50,6 +58,8 @@ export default class EventService {
 			categories: formattedCategories,
 			coverImage: eventCover,
 			video: eventVideo,
+			contestStart,
+			contestEnd,
 		});
 
 		await event.save();
@@ -60,10 +70,18 @@ export default class EventService {
 		let event = await this.getOne({ _id: eventId });
 		if (!event) throw new NotFoundError(`Event not found`);
 
-		const { eventName, description, categories, eventCover, eventVideo } = updateData;
+		const {
+			eventName,
+			description,
+			categories,
+			eventCover,
+			eventVideo,
+			contestStart,
+			contestEnd,
+		} = updateData;
 		const { eventName: previousName, label: previousLabel } = event;
 
-		const label = eventName !== previousName ? helperUtil.getLabel(eventName) : previousLabel;		
+		const label = eventName !== previousName ? helperUtil.getLabel(eventName) : previousLabel;
 		if (label !== previousLabel) await this.checkLabel(label);
 
 		const formattedCategories = categories.split(',').map((category) => {
@@ -75,6 +93,8 @@ export default class EventService {
 		event.categories = formattedCategories;
 		event.coverImage = eventCover || event.coverImage;
 		event.video = eventVideo || event.video;
+		event.contestStart = contestStart || event.contestStart;
+		event.contestEnd = contestEnd || event.contestEnd;
 
 		await event.save();
 		return event;

@@ -20,7 +20,6 @@ const eventSchema = new mongoose.Schema({
 		type: [String],
 		required: true,
 	},
-	registrationStart: { type: Date },
 	reviewStart: { type: Date },
 	contestStart: { type: Date },
 	contestEnd: { type: Date },

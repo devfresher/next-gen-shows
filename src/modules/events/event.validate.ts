@@ -15,6 +15,8 @@ export default class EventValidator {
 				videoId: Joi.string().trim().label('Video ID'),
 				url: Joi.string().uri().trim().label('URL'),
 			}).label('Event Video'),
+			contestStart: Joi.date().greater('now').raw().label('Contest start date'),
+			contestEnd: Joi.date().greater(Joi.ref('contestStart')).raw().label('Contest end date'),
 		});
 
 		return validationSchema.validate(req.body, options);
@@ -88,6 +90,8 @@ export default class EventValidator {
 				videoId: Joi.string().trim().label('Video ID'),
 				url: Joi.string().uri().trim().label('URL'),
 			}).label('Event Video'),
+			contestStart: Joi.date().greater('now').raw().label('Contest start date'),
+			contestEnd: Joi.date().greater(Joi.ref('contestStart')).raw().label('Contest end date'),
 		});
 
 		return validationSchema.validate(req.body, options);

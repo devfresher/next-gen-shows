@@ -15,6 +15,8 @@ export interface Event extends Document {
 		videoId: string;
 	};
 	createdAt: Date;
+	contestStart: Date;
+	contestEnd: Date;
 }
 
 export interface CreateEventInput {
@@ -23,6 +25,8 @@ export interface CreateEventInput {
 	categories: string;
 	eventCover: ImageUploadResponse;
 	eventVideo: VideoUploadResponse;
+	contestStart: Date;
+	contestEnd: Date;
 }
 
 export interface UpdateEventInput {
@@ -31,6 +35,8 @@ export interface UpdateEventInput {
 	categories?: string;
 	eventCover?: ImageUploadResponse;
 	eventVideo?: VideoUploadResponse;
+	contestStart?: Date;
+	contestEnd?: Date;
 }
 
 export interface JoinEventInput {

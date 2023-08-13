@@ -52,8 +52,9 @@ router.delete(
 	EventController.deleteEvent
 );
 
-router.get('/:eventId', EventController.getOne);
 router.get('/', EventController.getAll);
+router.get('/upcoming-events', EventController.getUpcomingEvents);
+router.get('/:eventId', EventController.getOne);
 router.get('/:eventId/participants', ParticipationController.getAllEventParticipants);
 
 export default router;

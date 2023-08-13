@@ -77,9 +77,17 @@ export default class EventValidator {
 
 	static updateEvent(req: Request): ValidationResult {
 		const validationSchema = Joi.object({
-			eventName: Joi.string().required().trim().label('Event Name'),
-			description: Joi.string().required().trim().min(5).label('Description'),
-			categories: Joi.string().required().trim().label('Categories'),
+			eventName: Joi.string().trim().label('Event Name'),
+			description: Joi.string().trim().min(5).label('Description'),
+			categories: Joi.string().trim().label('Categories'),
+			eventCover: Joi.object({
+				imageId: Joi.string().trim().label('Image ID'),
+				url: Joi.string().uri().trim().label('URL'),
+			}).label('Event Cover'),
+			eventVideo: Joi.object({
+				videoId: Joi.string().trim().label('Video ID'),
+				url: Joi.string().uri().trim().label('URL'),
+			}).label('Event Video'),
 		});
 
 		return validationSchema.validate(req.body, options);

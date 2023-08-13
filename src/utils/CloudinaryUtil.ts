@@ -23,8 +23,8 @@ class CloudinaryUtil {
 		return await this.cloudinary.uploader.upload(file, uploadSettings);
 	}
 
-	public async deleteFromCloudinary(imagePublicId: string): Promise<unknown> {
-		return await this.cloudinary.uploader.destroy(imagePublicId);
+	public async deleteFromCloudinary(assetId: string): Promise<any> {
+		return await this.cloudinary.uploader.destroy(assetId);
 	}
 }
 

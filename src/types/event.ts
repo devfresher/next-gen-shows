@@ -3,6 +3,7 @@ import { VideoUploadResponse, ImageUploadResponse } from './general';
 
 export interface Event extends Document {
 	eventName: string;
+	label: string;
 	description: string;
 	categories: string[];
 	coverImage: {
@@ -25,9 +26,11 @@ export interface CreateEventInput {
 }
 
 export interface UpdateEventInput {
-	eventName: string;
-	description: string;
-	categories: string;
+	eventName?: string;
+	description?: string;
+	categories?: string;
+	eventCover?: ImageUploadResponse;
+	eventVideo?: VideoUploadResponse;
 }
 
 export interface JoinEventInput {

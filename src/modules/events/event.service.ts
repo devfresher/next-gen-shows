@@ -5,7 +5,8 @@ import { FilterQuery, PageFilter } from '../../types/general';
 import EventModel from './event.model';
 import { PaginateOptions, PaginateResult } from 'mongoose';
 import Pagination from '../../utils/PaginationUtil';
-import helperUtil from '../../utils/HelperUtil'
+import helperUtil from '../../utils/HelperUtil';
+import CloudinaryUtil from '../../utils/CloudinaryUtil';
 
 export default class EventService {
 	private static model = EventModel;
@@ -37,13 +38,12 @@ export default class EventService {
 		const { eventName, description, categories, eventCover, eventVideo } = eventData;
 		const label = helperUtil.getLabel(eventName);
 
-		let event = await this.getOne({ label });
-		if (event) throw new ConflictError(`${eventName} already exists`);
+		await this.checkLabel(label);
 
 		const formattedCategories = categories.split(',').map((category) => {
 			return trim(category);
 		});
-		event = new this.model({
+		const event = new this.model({
 			eventName,
 			label,
 			description,
@@ -60,14 +60,21 @@ export default class EventService {
 		let event = await this.getOne({ _id: eventId });
 		if (!event) throw new NotFoundError(`Event not found`);
 
-		const { eventName, description, categories } = updateData;
+		const { eventName, description, categories, eventCover, eventVideo } = updateData;
+		const { eventName: previousName, label: previousLabel } = event;
+
+		const label = eventName !== previousName ? helperUtil.getLabel(eventName) : previousLabel;		
+		if (label !== previousLabel) await this.checkLabel(label);
 
 		const formattedCategories = categories.split(',').map((category) => {
 			return trim(category);
 		});
-		event.eventName = eventName;
-		event.description = description;
+		event.eventName = eventName || previousName;
+		event.label = label;
+		event.description = description || event.description;
 		event.categories = formattedCategories;
+		event.coverImage = eventCover || event.coverImage;
+		event.video = eventVideo || event.video;
 
 		await event.save();
 		return event;
@@ -76,5 +83,13 @@ export default class EventService {
 	public static async delete(eventId: string): Promise<void> {
 		const event = await this.model.findByIdAndDelete(eventId);
 		if (!event) throw new NotFoundError(`Event not found`);
+
+		await CloudinaryUtil.deleteFromCloudinary(event.coverImage?.imageId);
+		await CloudinaryUtil.deleteFromCloudinary(event.video?.videoId);
+	}
+
+	private static async checkLabel(label: string) {
+		const event = await this.getOne({ label });
+		if (event) throw new ConflictError(`Event ${event.eventName} already exists`);
 	}
 }

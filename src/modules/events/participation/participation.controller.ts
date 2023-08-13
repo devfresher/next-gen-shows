@@ -25,23 +25,6 @@ export default class ParticipationController {
 		}
 	}
 
-	static async uploadVideo(req: Request, res: Response, next: NextFunction) {
-		try {
-			const { file } = req;
-
-			const uploadedVideo = await ParticipationService.processVideoUpload(
-				file,
-				'in_action_video'
-			);
-			res.status(201).json({
-				message: 'Video uploaded successfully',
-				data: uploadedVideo,
-			});
-		} catch (error) {
-			next(error);
-		}
-	}
-
 	static async joinEvent(req: Request, res: Response, next: NextFunction) {
 		try {
 			const userId = req.user._id;

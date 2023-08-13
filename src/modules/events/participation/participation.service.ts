@@ -1,5 +1,5 @@
 import { BadRequestError, ConflictError, NotFoundError } from '../../../errors';
-import { Event, JoinEventInput } from '../../../types/event';
+import { JoinEventInput } from '../../../types/event';
 import { FilterQuery, PageFilter } from '../../../types/general';
 import { Participation } from '../../../types/participation';
 import CloudinaryUtil from '../../../utils/CloudinaryUtil';
@@ -11,7 +11,6 @@ import ParticipationModel from './participation.model';
 import { MetaData as ParticipationData } from '../../../types/participation';
 import PaystackUtil from '../../../utils/PaystackUtil';
 import { config } from '../../../utils/config';
-import { ParticipantWithVotes, User } from '../../../types/user';
 import { PaginateResult } from 'mongoose';
 import { PaginateOptions } from 'mongoose';
 import Pagination from '../../../utils/PaginationUtil';
@@ -126,11 +125,6 @@ export default class ParticipationService {
 		} = initializedPayment;
 
 		return { reference, authorization_url };
-	}
-
-	public static async processVideoUpload(file: Express.Multer.File, uploadFolder: string) {
-		const video = await CloudinaryUtil.upload(file.path, 'video', uploadFolder);
-		return { videoId: video.asset_id, url: video.secure_url };
 	}
 
 	public static async getAllEventParticipants(

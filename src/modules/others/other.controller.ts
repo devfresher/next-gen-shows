@@ -15,4 +15,32 @@ export default class OtherController {
 			next(error);
 		}
 	}
+
+	static async uploadVideo(req: Request, res: Response, next: NextFunction) {
+		try {
+			const { file } = req;
+
+			const uploadedVideo = await OtherService.processVideoUpload(file);
+			res.status(201).json({
+				message: 'Video uploaded successfully',
+				data: uploadedVideo,
+			});
+		} catch (error) {
+			next(error);
+		}
+	}
+
+	static async uploadImage(req: Request, res: Response, next: NextFunction) {
+		try {
+			const { file } = req;
+
+			const uploadedImage = await OtherService.processImageUpload(file);
+			res.status(201).json({
+				message: 'Image uploaded successfully',
+				data: uploadedImage,
+			});
+		} catch (error) {
+			next(error);
+		}
+	}
 }

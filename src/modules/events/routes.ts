@@ -37,13 +37,6 @@ router.post(
 
 router.get('/voting/confirm-payment', VotingController.confirmPayment);
 
-router.post(
-	'/upload-in-action-video',
-	AuthMiddleware.authenticateToken,
-	UploadMiddleware.uploadSingleVideo('in_action_video'),
-	ParticipationController.uploadVideo
-);
-
 router.put(
 	'/:eventId',
 	AuthMiddleware.authenticateAdmin,

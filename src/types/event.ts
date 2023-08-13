@@ -1,4 +1,5 @@
 import { Document } from 'mongoose';
+import { VideoUploadResponse, ImageUploadResponse } from './general';
 
 export interface Event extends Document {
 	eventName: string;
@@ -19,6 +20,8 @@ export interface CreateEventInput {
 	eventName: string;
 	description: string;
 	categories: string;
+	eventCover: ImageUploadResponse;
+	eventVideo: VideoUploadResponse;
 }
 
 export interface UpdateEventInput {

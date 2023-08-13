@@ -24,3 +24,13 @@ export interface ContactFormInput {
 	emailAddress: string;
 	message: string;
 }
+
+export interface VideoUploadResponse {
+	videoId: string,
+	url: string
+}
+
+export interface ImageUploadResponse {
+	imageId: string,
+	url: string
+}

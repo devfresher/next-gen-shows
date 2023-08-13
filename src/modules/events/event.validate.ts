@@ -7,6 +7,14 @@ export default class EventValidator {
 			eventName: Joi.string().required().trim().label('Event Name'),
 			description: Joi.string().required().trim().min(5).label('Description'),
 			categories: Joi.string().required().trim().label('Categories'),
+			eventCover: Joi.object({
+				imageId: Joi.string().required().trim().label('Image ID'),
+				url: Joi.string().uri().required().trim().label('URL'),
+			}).label('Event Cover'),
+			eventVideo: Joi.object({
+				videoId: Joi.string().trim().label('Video ID'),
+				url: Joi.string().uri().trim().label('URL'),
+			}).label('Event Video'),
 		});
 
 		return validationSchema.validate(req.body, options);

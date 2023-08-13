@@ -1,6 +1,7 @@
 import mongoose from 'mongoose';
 import paginate from 'mongoose-paginate-v2';
 import { User } from '../../types/user';
+import { PaginateModel } from 'mongoose';
 
 const userSchema = new mongoose.Schema({
 	firstName: {
@@ -59,5 +60,9 @@ userSchema.pre('save', function (next) {
 	this.fullName = `${this.firstName || ''} ${this.lastName || ''}`.trim();
 	next();
 });
-const UserModel = mongoose.model<User>('User', userSchema);
+
+interface UserModel extends PaginateModel<User, Document> {}
+
+userSchema.plugin(paginate);
+const UserModel = mongoose.model<User, UserModel>('User', userSchema);
 export default UserModel;

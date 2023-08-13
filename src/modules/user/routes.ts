@@ -14,4 +14,9 @@ router.put(
 	UserController.onboarding
 )
 
+router.get(
+	'/participants',
+	AuthMiddleware.authenticateToken,
+	UserController.getAllParticipants
+);
 export default router

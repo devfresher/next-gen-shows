@@ -25,6 +25,27 @@ export default class UserController {
 		}
 	}
 
+	static async updateProfile(req: Request, res: Response, next: NextFunction) {
+		try {
+			const userId = req.user._id.toString();
+			const updateData = {
+				firstName: req.body.firstName,
+				lastName: req.body.lastName,
+				stageName: req.body.stageName,
+				country: req.body.country,
+				city: req.body.city,
+			};
+			const user = await UserService.updateUser(userId, updateData);
+
+			return res.status(200).json({
+				message: 'Profile update successful',
+				data: user,
+			});
+		} catch (error) {
+			next(error);
+		}
+	}
+
 	static async getAllParticipants(req: Request, res: Response, next: NextFunction) {
 		try {
 			const { page, limit } = req.query;

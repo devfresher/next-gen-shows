@@ -38,6 +38,8 @@ const userSchema = new mongoose.Schema({
 	isVoter: { type: Boolean, default: false },
 	reason: String,
 	phoneNumber: String,
+	city: String,
+	country: String,
 	passwordReset: {
 		type: {
 			token: String,

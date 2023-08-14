@@ -74,6 +74,8 @@ export default class UserService {
 			portfolio,
 			talent,
 			reason,
+			country,
+			city,
 		} = userData;
 
 		let user = await this.getOne({ _id: userId });
@@ -90,6 +92,8 @@ export default class UserService {
 				portfolio,
 				talent,
 				reason,
+				country,
+				city,
 			}
 		);
 		user = await this.getOne({ _id: userId });

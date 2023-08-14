@@ -42,6 +42,8 @@ export interface UpdateUserInput {
 	phoneNumber?: string;
 	emailVerified?: boolean;
 	reason?: string;
+	country?: string;
+	city?: string;
 }
 
 export interface Voter {

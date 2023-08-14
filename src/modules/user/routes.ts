@@ -1,22 +1,25 @@
-import { Router } from "express"
+import { Router } from 'express';
 
-import ValidationMiddleware from "../../middleware/validate"
-import UserController from "./user.controller"
-import UserValidator from "./user.validate"
-import AuthMiddleware from "../../middleware/auth"
+import ValidationMiddleware from '../../middleware/validate';
+import UserController from './user.controller';
+import UserValidator from './user.validate';
+import AuthMiddleware from '../../middleware/auth';
 
-const router = Router()
+const router = Router();
 
 router.put(
-	"/onboarding",
+	'/onboarding',
 	AuthMiddleware.authenticateToken,
 	ValidationMiddleware.validateRequest(UserValidator.onboarding),
 	UserController.onboarding
-)
-
-router.get(
-	'/participants',
-	AuthMiddleware.authenticateToken,
-	UserController.getAllParticipants
 );
-export default router
+
+router.put(
+	'/update-profile',
+	AuthMiddleware.authenticateToken,
+	ValidationMiddleware.validateRequest(UserValidator.updateProfile),
+	UserController.updateProfile
+);
+
+router.get('/participants', AuthMiddleware.authenticateToken, UserController.getAllParticipants);
+export default router;

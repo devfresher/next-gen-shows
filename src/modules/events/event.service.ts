@@ -16,6 +16,10 @@ export default class EventService {
 		return event || null;
 	}
 
+	public static async getManyForService(filterQuery: FilterQuery): Promise<Event[]> {
+		return await this.model.find(filterQuery);
+	}
+
 	public static async getMany(
 		filterQuery: FilterQuery,
 		pageFilter?: PageFilter

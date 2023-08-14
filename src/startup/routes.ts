@@ -7,6 +7,7 @@ import authRouter from '../modules/auth/routes';
 import userRouter from '../modules/user/routes';
 import eventRouter from '../modules/events/routes';
 import otherRouter from '../modules/others/routes';
+import adminRouter from '../modules/admin/routes';
 import webRouter from '../modules/web/routes';
 
 import ResponseMiddleware from '../middleware/response';
@@ -35,6 +36,7 @@ const apiRoutes = (router: Router) => {
 	router.use('/auth', authRouter);
 	router.use('/user', userRouter);
 	router.use('/events', eventRouter);
+	router.use('/admin', adminRouter);
 
 	return router;
 };

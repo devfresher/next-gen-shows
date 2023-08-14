@@ -36,6 +36,10 @@ export default class UserService {
 		return await this.model.paginate(filterQuery, paginateOption);
 	}
 
+	public static async getManyForService(filterQuery: FilterQuery): Promise<User[]> {
+		return await this.model.find(filterQuery);
+	}
+
 	static async createUser(userData: CreateUserInput): Promise<User> {
 		const { email, password, phoneNumber } = userData;
 

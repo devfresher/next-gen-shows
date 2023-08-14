@@ -36,7 +36,8 @@ export default class ParticipationController {
 				eventId,
 				data
 			);
-			// res.send(`${authorization_url}`);
+			
+			console.log(`${authorization_url}`);
 			res.redirect(`${authorization_url}`);
 		} catch (error) {
 			next(error);

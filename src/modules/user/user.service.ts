@@ -102,7 +102,10 @@ export default class UserService {
 
 	public static async profileCompleted(userId: string): Promise<boolean> {
 		const user = await this.getOne({ _id: userId });
-		if (user?.fullName && user?.email && user?.phoneNumber && user?.portfolio) return true;
+		if (
+			(user?.firstName, user?.lastName && user?.email && user?.phoneNumber && user?.portfolio)
+		)
+			return true;
 
 		return false;
 	}

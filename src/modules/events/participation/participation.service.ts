@@ -85,7 +85,7 @@ export default class ParticipationService {
 			const profileCompleted = await UserService.profileCompleted(userId);
 			if (!profileCompleted) throw new BadRequestError('Profile not completed');
 
-			fullName = user.fullName;
+			fullName = `${user.firstName} ${user.lastName}`;
 			phoneNumber = user.phoneNumber;
 			email = user.email;
 			portfolio = user.portfolio;

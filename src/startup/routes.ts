@@ -15,8 +15,13 @@ import { NotFoundError } from '../errors';
 
 const routeApp = function (app: Express) {
 	app.use(bodyParser.json());
-	app.use(cors());
 	app.use(helmet());
+	app.use(
+		cors({
+			origin: '*',
+			methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+		})
+	);
 
 	const router = Router();
 	app.use('/api', apiRoutes(router));

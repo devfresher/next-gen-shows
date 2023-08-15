@@ -13,11 +13,15 @@ const ParticipationSchema = new mongoose.Schema({
 			_id: false,
 		},
 	},
+	category: { type: String },
 	paymentRef: { type: String },
 	createdAt: { type: Date, default: Date.now },
 });
 interface ParticipationModel extends PaginateModel<Participation, Document> {}
 
 ParticipationSchema.plugin(paginate);
-const ParticipationModel = mongoose.model<Participation, ParticipationModel>('Participation', ParticipationSchema);
+const ParticipationModel = mongoose.model<Participation, ParticipationModel>(
+	'Participation',
+	ParticipationSchema
+);
 export default ParticipationModel;

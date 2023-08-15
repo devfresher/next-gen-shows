@@ -7,6 +7,7 @@ export interface Participation extends Document {
 	event: Event;
 	registeredData: object;
 	multimedia: { url: string; id: string };
+	category: string;
 	paymentRef: string;
 	createdAt: Date;
 }
@@ -20,6 +21,7 @@ export interface MetaData {
 		phoneNumber: string;
 		portfolio: string;
 	};
+	category: string;
 	multimedia?: {
 		id?: string;
 		url?: string;

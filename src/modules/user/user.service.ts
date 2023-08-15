@@ -50,6 +50,7 @@ export default class UserService {
 			email,
 			phoneNumber,
 			password: await AuthService.hashPassword(password),
+			isParticipant: true,
 		});
 
 		await newUser.save();
@@ -80,6 +81,7 @@ export default class UserService {
 			reason,
 			country,
 			city,
+			isOnboard
 		} = userData;
 
 		let user = await this.getOne({ _id: userId });
@@ -98,6 +100,7 @@ export default class UserService {
 				reason,
 				country,
 				city,
+				isOnboard,
 			}
 		);
 		user = await this.getOne({ _id: userId });

@@ -72,7 +72,7 @@ export default class ParticipationService {
 		eventId: string,
 		data: JoinEventInput
 	): Promise<{ reference: string; authorization_url: string }> {
-		let { fullName, email, phoneNumber, portfolio, useAsOnProfile, videoFile } = data;
+		let { fullName, email, phoneNumber, portfolio, useAsOnProfile, videoFile, category } = data;
 		let videoUploaded: cloud.UploadApiResponse;
 
 		const user = await UserService.getOne({ _id: userId });
@@ -107,6 +107,7 @@ export default class ParticipationService {
 				phoneNumber,
 				portfolio,
 			},
+			category,
 			multimedia: {
 				id: videoUploaded?.asset_id,
 				url: videoUploaded?.secure_url,
@@ -138,12 +139,12 @@ export default class ParticipationService {
 		const participationData = data as Participation[];
 
 		const participantPromise = participationData.map(async (participation) => {
-			const { user: participant } = participation;
+			const { user: participant, category } = participation;
 
 			if (participant) {
 				const participantId = participant?._id;
 				const votes = await this.countParticipantVotes(participantId, eventId);
-				return { ...participant.toObject(), votes };
+				return { ...participant.toObject(), votes, category };
 			}
 			return;
 		});

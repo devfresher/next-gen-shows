@@ -30,6 +30,7 @@ export interface CreateUserInput {
 	phoneNumber?: string;
 	isVoter?: boolean;
 	isAdmin?: boolean;
+	isParticipant?: boolean;
 }
 
 export interface UpdateUserInput {
@@ -44,6 +45,7 @@ export interface UpdateUserInput {
 	reason?: string;
 	country?: string;
 	city?: string;
+	isOnboard?: boolean;
 }
 
 export interface Voter {

@@ -53,7 +53,6 @@ export default class EventValidator {
 				otherwise: Joi.forbidden(),
 			}),
 			category: Joi.string().trim().required().label('Category'),
-			subCategory: Joi.string().trim().label('Sub Category'),
 		});
 
 		return validationSchema.validate(req.body, options);

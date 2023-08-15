@@ -13,6 +13,7 @@ export default class UserController {
 				talent: req.body.talent,
 				reason: req.body.reason,
 				portfolio: req.body.portfolio,
+				isOnboard: true,
 			};
 			const user = await UserService.updateUser(userId, updateData);
 

@@ -44,6 +44,7 @@ export interface JoinEventInput {
 	fullName: string;
 	email: string;
 	phoneNumber: string;
+	category: string;
 	portfolio: string;
 	videoFile?: Express.Multer.File;
 }

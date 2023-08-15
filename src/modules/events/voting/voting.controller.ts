@@ -18,8 +18,8 @@ export default class VotingController {
 				participantId,
 				numberOfVotes
 			);
-			res.send(`${authorization_url}`);
-			// res.redirect(`${authorization_url}`);
+			console.log(`${authorization_url}`);
+			res.redirect(`${authorization_url}`);
 		} catch (error) {
 			next(error);
 		}

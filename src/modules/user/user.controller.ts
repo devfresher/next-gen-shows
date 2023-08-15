@@ -26,6 +26,20 @@ export default class UserController {
 		}
 	}
 
+	static async getParticipant(req: Request, res: Response, next: NextFunction) {
+		try {
+			const { userId } = req.params;
+			const user = await UserService.getOne({ _id: userId, isParticipant: true });
+
+			return res.status(200).json({
+				message: 'User retrieved successfully',
+				data: user,
+			});
+		} catch (error) {
+			next(error);
+		}
+	}
+
 	static async updateProfile(req: Request, res: Response, next: NextFunction) {
 		try {
 			const userId = req.user._id.toString();

@@ -22,4 +22,6 @@ router.put(
 );
 
 router.get('/participants', AuthMiddleware.authenticateToken, UserController.getAllParticipants);
+router.get('/participants/:userId', UserController.getParticipant);
+
 export default router;

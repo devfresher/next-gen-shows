@@ -144,7 +144,7 @@ export default class ParticipationService {
 			if (participant) {
 				const participantId = participant?._id;
 				const votes = await this.countParticipantVotes(participantId, eventId);
-				return { ...participant.toObject(), votes, category };
+				return { participant, votes, category };
 			}
 			return;
 		});

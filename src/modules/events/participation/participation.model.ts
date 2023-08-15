@@ -14,6 +14,7 @@ const ParticipationSchema = new mongoose.Schema({
 		},
 	},
 	category: { type: String },
+	status: { type: String, default: 'Joined' },
 	paymentRef: { type: String },
 	createdAt: { type: Date, default: Date.now },
 });

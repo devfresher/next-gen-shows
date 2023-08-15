@@ -5,20 +5,79 @@ import { config } from '../../../utils/config';
 import { PageFilter } from '../../../types/general';
 
 export default class ParticipationController {
-	static async getAllEventParticipants(req: Request, res: Response, next: NextFunction) {
+	static async getAllParticipant(req: Request, res: Response, next: NextFunction) {
+		try {
+			const { page, limit } = req.query;
+
+			const pageFilter: PageFilter = { page: Number(page), limit: Number(limit) };
+			const participantResult = await ParticipationService.getAllParticipation(pageFilter);
+
+			res.status(200).json({
+				message: 'Participants retrieved successfully',
+				data: participantResult,
+			});
+		} catch (error) {
+			next(error);
+		}
+	}
+
+	static async getAllParticipationOfEvent(req: Request, res: Response, next: NextFunction) {
 		try {
 			const { eventId } = req.params;
 			const { page, limit } = req.query;
 
 			const pageFilter: PageFilter = { page: Number(page), limit: Number(limit) };
-			const participantResult = await ParticipationService.getAllEventParticipants(
+			const participantResult = await ParticipationService.getAllParticipationOfEvent(
 				eventId,
 				pageFilter
 			);
 
 			res.status(200).json({
-				message: 'Participants retrieved successfully',
-				...participantResult,
+				message: 'All Participants retrieved successfully',
+				data: participantResult,
+			});
+		} catch (error) {
+			next(error);
+		}
+	}
+
+	static async getShortlistedParticipationOfEvent(
+		req: Request,
+		res: Response,
+		next: NextFunction
+	) {
+		try {
+			const { eventId } = req.params;
+			const { page, limit } = req.query;
+
+			const pageFilter: PageFilter = { page: Number(page), limit: Number(limit) };
+			const participantResult = await ParticipationService.getShortlistedParticipantOfEvent(
+				eventId,
+				pageFilter
+			);
+
+			res.status(200).json({
+				message: 'Shortlisted Participants retrieved successfully',
+				data: participantResult,
+			});
+		} catch (error) {
+			next(error);
+		}
+	}
+
+	static async getSingleParticipant(req: Request, res: Response, next: NextFunction) {
+		try {
+			const { eventId } = req.params;
+			const { participantId } = req.params;
+
+			const participant = await ParticipationService.getSingleParticipant(
+				eventId,
+				participantId
+			);
+
+			res.status(200).json({
+				message: 'Participant retrieved successfully',
+				data: participant,
 			});
 		} catch (error) {
 			next(error);
@@ -36,7 +95,7 @@ export default class ParticipationController {
 				eventId,
 				data
 			);
-			
+
 			console.log(`${authorization_url}`);
 			res.redirect(`${authorization_url}`);
 		} catch (error) {

@@ -20,8 +20,4 @@ router.put(
 	ValidationMiddleware.validateRequest(UserValidator.updateProfile),
 	UserController.updateProfile
 );
-
-router.get('/participants', AuthMiddleware.authenticateToken, UserController.getAllParticipants);
-router.get('/participants/:userId', UserController.getParticipant);
-
 export default router;

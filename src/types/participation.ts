@@ -10,6 +10,7 @@ export interface Participation extends Document {
 	category: string;
 	paymentRef: string;
 	createdAt: Date;
+	status: Status;
 }
 
 export interface MetaData {
@@ -26,4 +27,10 @@ export interface MetaData {
 		id?: string;
 		url?: string;
 	};
+}
+
+export enum Status {
+	Shortlisted,
+	Confirmed,
+	Joined,
 }

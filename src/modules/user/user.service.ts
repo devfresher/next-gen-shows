@@ -7,6 +7,7 @@ import { sendEmail } from '../mailer/EmailService';
 import { config } from '../../utils/config';
 import { PaginateOptions, PaginateResult } from 'mongoose';
 import Pagination from '../../utils/PaginationUtil';
+import ParticipationService from '../events/participation/participation.service';
 
 export default class UserService {
 	static model = UserModel;
@@ -16,6 +17,15 @@ export default class UserService {
 		const user = await this.model.findOne(filterQuery, projection);
 
 		return user || null;
+	}
+
+	static async getUserProfile(userId: string): Promise<any> {
+		const user = await this.getOne({ _id: userId }, true);
+		if (!user) throw new NotFoundError('User does not exist');
+
+		const stats = await ParticipationService.getParticipantStats(user._id);
+		const events = await ParticipationService.getParticipantEvents(user._id);
+		return { user, stats, events };
 	}
 
 	public static async getMany(
@@ -81,7 +91,7 @@ export default class UserService {
 			reason,
 			country,
 			city,
-			isOnboard
+			isOnboard,
 		} = userData;
 
 		let user = await this.getOne({ _id: userId });

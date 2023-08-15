@@ -128,7 +128,7 @@ export default class ParticipationService {
 		return { reference, authorization_url };
 	}
 
-	public static async getAllEventParticipants(
+	public static async getAllParticipationOfEvent(
 		eventId: string,
 		pageFilter: PageFilter
 	): Promise<any> {
@@ -138,20 +138,95 @@ export default class ParticipationService {
 		const { data, paging } = await this.getMany({ event: eventId }, pageFilter);
 		const participationData = data as Participation[];
 
-		const participantPromise = participationData.map(async (participation) => {
-			const { user: participant, category } = participation;
+		const participationPromise = participationData.map(async (participation) => {
+			const { _id, user: participant, ...otherData } = participation.toObject();
 
 			if (participant) {
 				const participantId = participant?._id;
-				const votes = await this.countParticipantVotes(participantId, eventId);
-				return { participant, votes, category };
+				const votes = await this.countParticipantVotes(participantId, event._id);
+				return { ...participant, votes };
 			}
-			return;
+			return participant;
 		});
 
-		const participants = await Promise.all(participantPromise);
+		const allParticipation = await Promise.all(participationPromise);
+		return { data: allParticipation, paging };
+	}
 
-		return { data: participants, paging };
+	public static async getShortlistedParticipantOfEvent(
+		eventId: string,
+		pageFilter: PageFilter
+	): Promise<any> {
+		const event = await EventService.getOne({ _id: eventId });
+		if (!event) throw new NotFoundError('Event not found');
+
+		const { data, paging } = await this.getMany(
+			{ event: eventId, status: 'Shortlisted' },
+			pageFilter
+		);
+		const participationData = data as Participation[];
+
+		const participationPromise = participationData.map(async (participation) => {
+			const { _id, user: participant, ...otherData } = participation.toObject();
+
+			if (participant) {
+				const participantId = participant?._id;
+				const votes = await this.countParticipantVotes(participantId, event._id);
+				return { ...participant, votes };
+			}
+			return participant;
+		});
+
+		const allParticipation = await Promise.all(participationPromise);
+		return { data: allParticipation, paging };
+	}
+
+	public static async getAllParticipation(pageFilter: PageFilter): Promise<any> {
+		const { data, paging } = await this.getMany({}, pageFilter);
+		const participationData = data as Participation[];
+
+		const participationPromise = participationData.map(async (participation) => {
+			const { _id, user: participant, ...otherData } = participation.toObject();
+			const { event } = otherData;
+
+			if (participant) {
+				const participantId = participant?._id;
+				const votes = await this.countParticipantVotes(participantId, event._id);
+				return {
+					participant: {
+						...participant,
+						votes,
+					},
+					...otherData,
+				};
+			}
+			return { participant, ...otherData };
+		});
+
+		const allParticipation = await Promise.all(participationPromise);
+		return { data: allParticipation, paging };
+	}
+
+	public static async getSingleParticipant(eventId: string, participantId: string): Promise<any> {
+		const event = await EventService.getOne({ _id: eventId });
+		if (!event) throw new NotFoundError('Event not found');
+
+		const user = await UserService.getOne({ _id: participantId });
+		if (!user) throw new NotFoundError('User not found');
+
+		const participation = await ParticipationService.getOne({
+			event: eventId,
+			user: participantId,
+		});
+		if (!participation) throw new NotFoundError('User is not a participant of the event');
+		const { _id, user: participant, ...otherData } = participation.toObject();
+
+		const votes = await this.countParticipantVotes(participantId, eventId);
+
+		return {
+			participant: { ...participant, votes },
+			...otherData,
+		};
 	}
 
 	public static async countParticipantVotes(
@@ -169,5 +244,39 @@ export default class ParticipationService {
 		});
 		const voteCount = votes.reduce((sum: number, vote: Voting) => (sum += vote.votes), 0);
 		return voteCount;
+	}
+
+	public static async getParticipantStats(participantId: string): Promise<any> {
+		const eventsConfirmed = await this.getForService({
+			user: participantId,
+			status: 'Confirmed',
+		});
+		const eventsShortlisted = await this.getForService({
+			user: participantId,
+			status: 'Shortlisted',
+		});
+
+		const eventsJoined = await this.getForService({
+			user: participantId,
+		});
+
+		return {
+			won: eventsConfirmed.length,
+			current: eventsShortlisted.length,
+			all: eventsJoined.length,
+		};
+	}
+
+	public static async getParticipantEvents(participantId: string): Promise<any> {
+		const allParticipation = await this.getForService({
+			user: participantId,
+		});
+
+		const events = allParticipation.map((participation) => {
+			const { event, user, ...otherData } = participation.toObject();
+			return { event, ...otherData };
+		});
+
+		return events;
 	}
 }

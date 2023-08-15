@@ -55,7 +55,10 @@ router.delete(
 router.get('/', EventController.getAll);
 router.get('/upcoming-events', EventController.getUpcomingEvents);
 router.get('/ongoing-events', EventController.getOngoingEvents);
+router.get('/participants', ParticipationController.getAllParticipant);
 router.get('/:eventId', EventController.getOne);
-router.get('/:eventId/participants', ParticipationController.getAllEventParticipants);
+router.get('/:eventId/participants', ParticipationController.getAllParticipationOfEvent);
+router.get('/:eventId/participants/shortlisted', ParticipationController.getShortlistedParticipationOfEvent);
+router.get('/:eventId/participants/:participantId', ParticipationController.getSingleParticipant);
 
 export default router;

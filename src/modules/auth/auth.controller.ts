@@ -36,11 +36,11 @@ export default class AuthController {
 			const {
 				user: { _id },
 			} = req;
-			const user = await UserService.getOne({ _id });
+			const profile = await UserService.getUserProfile(_id);
 
 			return res.status(200).json({
-				message: 'User retrieved',
-				data: user,
+				message: 'Profile retrieved',
+				data: profile,
 			});
 		} catch (error) {
 			next(error);

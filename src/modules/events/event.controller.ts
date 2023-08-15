@@ -54,7 +54,7 @@ export default class EventController {
 			const events = await EventService.getMany(filterQuery, pageFilter);
 			res.status(200).json({
 				message: 'Events retrieved successfully',
-				...events,
+				data: events,
 			});
 		} catch (error) {
 			next(error);
@@ -71,7 +71,7 @@ export default class EventController {
 			const events = await EventService.getMany(filterQuery, pageFilter);
 			res.status(200).json({
 				message: 'Upcoming events retrieved successfully',
-				...events,
+				data: events,
 			});
 		} catch (error) {
 			next(error);
@@ -88,7 +88,7 @@ export default class EventController {
 			const events = await EventService.getMany(filterQuery, pageFilter);
 			res.status(200).json({
 				message: 'Ongoing events retrieved successfully',
-				...events,
+				data: events,
 			});
 		} catch (error) {
 			next(error);
@@ -103,7 +103,7 @@ export default class EventController {
 			const event = await EventService.getOne(filterQuery);
 			res.status(200).json({
 				message: 'Event retrieved successfully',
-				...event.toObject(),
+				data: event.toObject(),
 			});
 		} catch (error) {
 			next(error);

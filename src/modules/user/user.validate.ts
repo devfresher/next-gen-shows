@@ -33,6 +33,10 @@ export default class UserValidator {
 				.messages({
 					'string.pattern.base': 'Invalid phone number',
 				}),
+			profileImage: Joi.object({
+				imageId: Joi.string().trim().label('Image ID'),
+				url: Joi.string().uri().trim().label('URL'),
+			}).label('Profile Image'),
 		});
 
 		return validationSchema.validate(req.body, options);

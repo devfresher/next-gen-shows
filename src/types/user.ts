@@ -1,4 +1,5 @@
 import { Document, Types } from 'mongoose';
+import { ImageFile } from './general';
 
 export interface User extends Document {
 	firstName?: string;
@@ -17,10 +18,7 @@ export interface User extends Document {
 		token: string;
 		expiry: Date;
 	};
-	profileImage?: {
-		url: string;
-		imageId: string;
-	};
+	profileImage?: ImageFile;
 	createdAt: Date;
 }
 
@@ -46,6 +44,7 @@ export interface UpdateUserInput {
 	country?: string;
 	city?: string;
 	isOnboard?: boolean;
+	profileImage?: ImageFile;
 }
 
 export interface Voter {

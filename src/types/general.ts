@@ -26,11 +26,21 @@ export interface ContactFormInput {
 }
 
 export interface VideoUploadResponse {
-	videoId: string,
-	url: string
+	videoId: string;
+	url: string;
 }
 
 export interface ImageUploadResponse {
-	imageId: string,
-	url: string
+	imageId: string;
+	url: string;
+}
+
+export interface VideoFile {
+	url: string;
+	videoId: string;
+}
+
+export interface ImageFile {
+	url: string;
+	imageId: string;
 }

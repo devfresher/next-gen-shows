@@ -34,6 +34,7 @@ export default class UserController {
 				stageName: req.body.stageName,
 				country: req.body.country,
 				city: req.body.city,
+				profileImage: req.body.profileImage,
 			};
 			const user = await UserService.updateUser(userId, updateData);
 

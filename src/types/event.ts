@@ -1,19 +1,13 @@
 import { Document } from 'mongoose';
-import { VideoUploadResponse, ImageUploadResponse } from './general';
+import { VideoUploadResponse, ImageUploadResponse, VideoFile, ImageFile } from './general';
 
 export interface Event extends Document {
 	eventName: string;
 	label: string;
 	description: string;
 	categories: string[];
-	coverImage: {
-		url: string;
-		imageId: string;
-	};
-	video?: {
-		url: string;
-		videoId: string;
-	};
+	coverImage: ImageFile;
+	video?: VideoFile;
 	createdAt: Date;
 	contestStart: Date;
 	contestEnd: Date;

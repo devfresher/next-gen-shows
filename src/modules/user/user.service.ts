@@ -92,6 +92,7 @@ export default class UserService {
 			country,
 			city,
 			isOnboard,
+			profileImage,
 		} = userData;
 
 		let user = await this.getOne({ _id: userId });
@@ -111,6 +112,7 @@ export default class UserService {
 				country,
 				city,
 				isOnboard,
+				profileImage,
 			}
 		);
 		user = await this.getOne({ _id: userId });

@@ -19,7 +19,8 @@ export default class VotingController {
 				numberOfVotes
 			);
 			console.log(`${authorization_url}`);
-			res.redirect(`${authorization_url}`);
+			// res.redirect(`${authorization_url}`);
+			res.status(200).send(`${authorization_url}`);
 		} catch (error) {
 			next(error);
 		}

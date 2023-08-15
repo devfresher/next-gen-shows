@@ -30,7 +30,7 @@ export interface MetaData {
 }
 
 export enum Status {
-	Shortlisted,
-	Confirmed,
-	Joined,
+	shortlisted = 'Shortlisted',
+	confirmed = 'Confirmed',
+	joined = 'Joined',
 }

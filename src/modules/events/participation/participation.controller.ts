@@ -84,6 +84,25 @@ export default class ParticipationController {
 		}
 	}
 
+	static async markAsShortlisted(req: Request, res: Response, next: NextFunction) {
+		try {
+			const { eventId } = req.params;
+			const { participantId } = req.params;
+
+			const participant = await ParticipationService.shortlistParticipant(
+				eventId,
+				participantId
+			);
+
+			res.status(200).json({
+				message: 'Participant shortlisted successfully',
+				data: participant,
+			});
+		} catch (error) {
+			next(error);
+		}
+	}
+
 	static async joinEvent(req: Request, res: Response, next: NextFunction) {
 		try {
 			const userId = req.user._id;

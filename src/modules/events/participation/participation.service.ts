@@ -1,7 +1,7 @@
 import { BadRequestError, ConflictError, NotFoundError } from '../../../errors';
 import { JoinEventInput } from '../../../types/event';
 import { FilterQuery, PageFilter } from '../../../types/general';
-import { Participation } from '../../../types/participation';
+import { Participation, Status } from '../../../types/participation';
 import CloudinaryUtil from '../../../utils/CloudinaryUtil';
 import cloud from 'cloudinary';
 
@@ -71,7 +71,7 @@ export default class ParticipationService {
 		userId: string,
 		eventId: string,
 		data: JoinEventInput
-	): Promise<{ reference: string; authorization_url: string }> {
+	): Promise<any> {
 		let { fullName, email, phoneNumber, portfolio, useAsOnProfile, videoFile, category } = data;
 		let videoUploaded: cloud.UploadApiResponse;
 
@@ -239,6 +239,29 @@ export default class ParticipationService {
 			participant: { ...participant, votes },
 			...otherData,
 		};
+	}
+
+	public static async shortlistParticipant(
+		eventId: string,
+		participantId: string
+	): Promise<Participation> {
+		const event = await EventService.getOne({ _id: eventId });
+		if (!event) throw new NotFoundError('Event not found');
+
+		const user = await UserService.getOne({ _id: participantId });
+		if (!user) throw new NotFoundError('User not found');
+
+		const participation = await ParticipationService.getOne({
+			event: eventId,
+			user: participantId,
+		});
+		if (!participation) throw new NotFoundError('User is not a participant of the event');
+		if (participation.status == Status.shortlisted)
+			throw new ConflictError('Participant is already shortlisted');
+
+		participation.status = Status.shortlisted;
+		await participation.save();
+		return participation;
 	}
 
 	public static async countParticipantVotes(

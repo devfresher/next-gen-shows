@@ -144,9 +144,15 @@ export default class ParticipationService {
 			if (participant) {
 				const participantId = participant?._id;
 				const votes = await this.countParticipantVotes(participantId, event._id);
-				return { ...participant, votes };
+				return {
+					participant: {
+						...participant,
+						votes,
+					},
+					...otherData,
+				};
 			}
-			return participant;
+			return { participant, ...otherData };
 		});
 
 		const allParticipation = await Promise.all(participationPromise);
@@ -172,9 +178,15 @@ export default class ParticipationService {
 			if (participant) {
 				const participantId = participant?._id;
 				const votes = await this.countParticipantVotes(participantId, event._id);
-				return { ...participant, votes };
+				return {
+					participant: {
+						...participant,
+						votes,
+					},
+					...otherData,
+				};
 			}
-			return participant;
+			return { participant, ...otherData };
 		});
 
 		const allParticipation = await Promise.all(participationPromise);
@@ -273,8 +285,8 @@ export default class ParticipationService {
 		});
 
 		const events = allParticipation.map((participation) => {
-			const { event, user, ...otherData } = participation.toObject();
-			return { event, ...otherData };
+			const { event, user, category, ...otherData } = participation.toObject();
+			return { event, category, ...otherData };
 		});
 
 		return events;

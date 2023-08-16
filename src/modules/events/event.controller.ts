@@ -82,7 +82,9 @@ export default class EventController {
 		try {
 			const { page, limit } = req.query;
 			const now = new Date();
-			let filterQuery: FilterQuery = { contestStart: { $lt: now } };
+			let filterQuery: FilterQuery = {
+				$and: [{ contestStart: { $lt: now } }, { contestEnd: { $gt: now } }],
+			};
 			const pageFilter: PageFilter = { page: Number(page), limit: Number(limit) };
 
 			const events = await EventService.getMany(filterQuery, pageFilter);

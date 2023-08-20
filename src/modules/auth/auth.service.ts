@@ -17,7 +17,7 @@ export default class AuthService {
 
 		if (!user.isActive)
 			throw new ForbiddenError(
-				'Your account has been deactivated. Please contact support for assistance.'
+				'Your account has been not been verified kindly verify via the email sent.'
 			);
 
 		const isValidPassword = await bcrypt.compare(password, user.password);

@@ -6,6 +6,9 @@ import helmet from 'helmet';
 import authRouter from '../modules/auth/routes';
 import userRouter from '../modules/user/routes';
 import eventRouter from '../modules/events/routes';
+import countryRouter from '../modules/country/routes';
+import categoryRouter from '../modules/category/routes';
+import talentRouter from '../modules/talent/routes';
 import otherRouter from '../modules/others/routes';
 import adminRouter from '../modules/admin/routes';
 import webRouter from '../modules/web/routes';
@@ -41,6 +44,10 @@ const apiRoutes = (router: Router) => {
 	router.use('/auth', authRouter);
 	router.use('/user', userRouter);
 	router.use('/events', eventRouter);
+	router.use('/countries', countryRouter);
+	router.use('/categories', categoryRouter);
+	router.use('/talents', talentRouter);
+
 	router.use('/admin', adminRouter);
 
 	return router;

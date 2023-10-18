@@ -6,21 +6,21 @@ export default class CategoryValidator {
 		const validationSchema = Joi.object({
 			name: Joi.string().required().trim().label('Category Name'),
 			description: Joi.string().required().trim().min(5).label('Description'),
-			eventId: Joi.number().required().label('Event'),
-			talentId: Joi.number().required().label('Talent'),
-			countryId: Joi.number().required().label('Country'),
+			eventId: Joi.string().required().label('Event'),
+			talentId: Joi.string().required().label('Talent'),
+			countryId: Joi.string().required().label('Country'),
 		});
 
 		return validationSchema.validate(req.body, options);
 	}
 
-	static updateEvent(req: Request): ValidationResult {
+	static updateCategory(req: Request): ValidationResult {
 		const validationSchema = Joi.object({
 			name: Joi.string().trim().label('Category Name'),
-			description: Joi.string().trim().min(5).label('Description'),
-			eventId: Joi.number().label('Event'),
-			talentId: Joi.number().label('Talent'),
-			countryId: Joi.number().label('Country'),
+			description: Joi.string().trim().label('Description'),
+			eventId: Joi.string().label('Event'),
+			talentId: Joi.string().label('Talent'),
+			countryId: Joi.string().label('Country'),
 		});
 
 		return validationSchema.validate(req.body, options);

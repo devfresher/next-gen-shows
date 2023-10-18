@@ -1,4 +1,6 @@
-const CountryService = require('./dist/modules/country/country.service.js');
+import winston from 'winston';
+import CountryService from '../../modules/country/country.service';
+import CountryModel from '../models/country.model';
 
 const countries = [
 	{ name: 'Algeria', continent: 'Africa' },
@@ -57,6 +59,15 @@ const countries = [
 	{ name: 'Zimbabwe', continent: 'Africa' },
 ];
 
-countries.map((country) => {
-	CountryService.create(country);
-});
+class Migration {
+	run = async () => {
+		CountryModel.deleteMany({});
+
+		countries.map((country) => {
+			CountryService.create(country);
+			winston.info(`Country ${country.name} created`);
+		});
+	};
+}
+
+export default new Migration();

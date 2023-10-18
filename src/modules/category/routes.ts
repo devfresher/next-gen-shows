@@ -1,10 +1,9 @@
 import { Router } from 'express';
 
-import AuthMiddleware from '../../middleware/auth';
-import ParticipationController from '../participation/participation.controller';
 import ValidationMiddleware from '../../middleware/validate';
+import AuthMiddleware from '../../middleware/auth';
+import CategoryValidator from './category.validate';
 import CategoryController from './category.controller';
-import CategoryValidator from './event.validate';
 
 const router = Router();
 
@@ -15,20 +14,22 @@ router.post(
 	CategoryController.create
 );
 
-router.get('/:categoryId/participants', ParticipationController.getAllParticipationOfCategory);
-router.get(
-	'/:categoryId/participants/shortlisted',
-	ParticipationController.getShortlistedParticipationOfCategory
-);
-router.get(
-	'/:categoryId/participants/:participantId',
-	ParticipationController.getSingleParticipant
+router.put(
+	'/:categoryId',
+	AuthMiddleware.authenticateAdmin,
+	ValidationMiddleware.validateObjectIds('categoryId'),
+	ValidationMiddleware.validateRequest(CategoryValidator.updateCategory),
+	CategoryController.updateCategory
 );
 
-router.patch(
-	'/:categoryId/shortlist/:participantId',
+router.delete(
+	'/:categoryId',
 	AuthMiddleware.authenticateAdmin,
-	ParticipationController.markAsShortlisted
+	ValidationMiddleware.validateObjectIds('categoryId'),
+	CategoryController.deleteCategory
 );
+
+router.get('/', AuthMiddleware.authenticateAdmin, CategoryController.getAll);
+router.get('/:categoryId', CategoryController.get);
 
 export default router;

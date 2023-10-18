@@ -33,6 +33,22 @@ export default class CategoryController {
 		}
 	}
 
+	static async getAll(req: Request, res: Response, next: NextFunction) {
+		try {
+			const { page, limit } = req.query;
+			let filterQuery: FilterQuery = {};
+			const pageFilter: PageFilter = { page: Number(page), limit: Number(limit) };
+
+			const categories = await CategoryService.getMany(filterQuery, pageFilter);
+			res.status(200).json({
+				message: 'Categories retrieved successfully',
+				data: categories,
+			});
+		} catch (error) {
+			next(error);
+		}
+	}
+
 	static async create(req: Request, res: Response, next: NextFunction) {
 		try {
 			const categoryData = req.body;

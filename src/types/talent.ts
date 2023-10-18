@@ -8,3 +8,13 @@ export interface Talent extends Document {
 	description: string;
 	createdAt: Date;
 }
+
+export interface CreateTalentInput {
+	name: string;
+	description: string;
+}
+
+export interface UpdateTalentInput {
+	name?: string;
+	description?: string;
+}

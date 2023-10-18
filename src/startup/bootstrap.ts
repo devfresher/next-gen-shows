@@ -18,7 +18,7 @@ export default async (app: Express) => {
 		await connectDB()
 		server.listen(PORT, HOST, () => {
 			winston.info(`${APP_NAME}'s Server started at http://${HOST}:${PORT}`)
-		}) 
+		})
 	} catch (err) {
 		config.DEBUG(err)
 	}

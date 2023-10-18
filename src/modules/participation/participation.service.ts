@@ -1,21 +1,26 @@
-import { BadRequestError, ConflictError, NotFoundError } from '../../../errors';
-import { JoinEventInput } from '../../../types/event';
-import { FilterQuery, PageFilter } from '../../../types/general';
-import { Participation, Status } from '../../../types/participation';
-import CloudinaryUtil from '../../../utils/CloudinaryUtil';
+import { BadRequestError, ConflictError, NotFoundError } from '../../errors';
+import { JoinEventInput } from '../../types/event';
+import { FilterQuery, ID, PageFilter } from '../../types/general';
+import { Participation, Status } from '../../types/participation';
+import CloudinaryUtil from '../../utils/CloudinaryUtil';
 import cloud from 'cloudinary';
 
-import UserService from '../../user/user.service';
-import EventService from '../event.service';
-import ParticipationModel from './participation.model';
-import { MetaData as ParticipationData } from '../../../types/participation';
-import PaystackUtil from '../../../utils/PaystackUtil';
-import { config } from '../../../utils/config';
+import UserService from '../user/user.service';
+import EventService from '../events/event.service';
+import ParticipationModel from '../../db/models/participation.model';
+import { MetaData as ParticipationData } from '../../types/participation';
+import PaystackUtil from '../../utils/PaystackUtil';
+import { config } from '../../utils/config';
 import { PaginateResult } from 'mongoose';
 import { PaginateOptions } from 'mongoose';
-import Pagination from '../../../utils/PaginationUtil';
+import Pagination from '../../utils/PaginationUtil';
 import VotingService from '../voting/voting.service';
-import { Voting } from '../../../types/voting';
+import { Voting } from '../../types/voting';
+import { Talent } from '../../types/talent';
+import { Country } from '../../types/country';
+import TalentService from '../talent/talent.service';
+import CountryService from '../country/country.service';
+import CategoryService from '../category/category.service';
 
 export default class ParticipationService {
 	private static model = ParticipationModel;
@@ -53,10 +58,12 @@ export default class ParticipationService {
 		paymentMetaData: ParticipationData,
 		paymentRef: string
 	): Promise<Participation> {
-		let { user, event, registeredData, multimedia } = paymentMetaData;
+		let { user, categoryId, registeredData, multimedia } = paymentMetaData;
+		await CategoryService.exist(categoryId);
+
 		const participationData = {
 			user,
-			event,
+			categoryId,
 			registeredData,
 			multimedia,
 			paymentRef,
@@ -72,7 +79,16 @@ export default class ParticipationService {
 		eventId: string,
 		data: JoinEventInput
 	): Promise<any> {
-		let { fullName, email, phoneNumber, portfolio, useAsOnProfile, videoFile, category } = data;
+		let {
+			fullName,
+			email,
+			phoneNumber,
+			portfolio,
+			useAsOnProfile,
+			videoFile,
+			talentId,
+			countryId,
+		} = data;
 		let videoUploaded: cloud.UploadApiResponse;
 
 		const user = await UserService.getOne({ _id: userId });
@@ -89,7 +105,19 @@ export default class ParticipationService {
 			phoneNumber = user.phoneNumber;
 			email = user.email;
 			portfolio = user.portfolio;
+			talentId = (user.talent as Talent)._id;
+			countryId = (user.country as Country)._id;
 		}
+
+		const talent = await TalentService.exist(talentId);
+		const country = await CountryService.exist(countryId);
+		const category = await CategoryService.getOne({
+			talent: talentId,
+			country: countryId,
+			event: eventId,
+		});
+		if (!category)
+			throw new BadRequestError('No category matches the talent-country selection');
 
 		if (videoFile) {
 			videoUploaded = await CloudinaryUtil.upload(videoFile.path, 'video', 'in_action_video');
@@ -100,14 +128,13 @@ export default class ParticipationService {
 
 		const participationData: ParticipationData = {
 			user: userId,
-			event: eventId,
+			categoryId: category._id,
 			registeredData: {
 				name: fullName,
 				email,
 				phoneNumber,
 				portfolio,
 			},
-			category,
 			multimedia: {
 				id: videoUploaded?.asset_id,
 				url: videoUploaded?.secure_url,
@@ -128,14 +155,13 @@ export default class ParticipationService {
 		return { reference, authorization_url };
 	}
 
-	public static async getAllParticipationOfEvent(
-		eventId: string,
+	public static async getAllParticipationOfCategory(
+		categoryId: ID,
 		pageFilter: PageFilter
 	): Promise<any> {
-		const event = await EventService.getOne({ _id: eventId });
-		if (!event) throw new NotFoundError('Event not found');
+		await CategoryService.exist(categoryId);
 
-		const { data, paging } = await this.getMany({ event: eventId }, pageFilter);
+		const { data, paging } = await this.getMany({ category: categoryId }, pageFilter);
 		const participationData = data as Participation[];
 
 		const participationPromise = participationData.map(async (participation) => {
@@ -143,7 +169,7 @@ export default class ParticipationService {
 
 			if (participant) {
 				const participantId = participant?._id;
-				const votes = await this.countParticipantVotes(participantId, event._id);
+				const votes = await this.countParticipantVotes(participantId, categoryId);
 				return {
 					participant: {
 						...participant,
@@ -159,15 +185,14 @@ export default class ParticipationService {
 		return { data: allParticipation, paging };
 	}
 
-	public static async getShortlistedParticipantOfEvent(
-		eventId: string,
+	public static async getShortlistedParticipantOfCategory(
+		categoryId: ID,
 		pageFilter: PageFilter
 	): Promise<any> {
-		const event = await EventService.getOne({ _id: eventId });
-		if (!event) throw new NotFoundError('Event not found');
+		await CategoryService.exist(categoryId);
 
 		const { data, paging } = await this.getMany(
-			{ event: eventId, status: 'Shortlisted' },
+			{ category: categoryId, status: 'Shortlisted' },
 			pageFilter
 		);
 		const participationData = data as Participation[];
@@ -177,7 +202,7 @@ export default class ParticipationService {
 
 			if (participant) {
 				const participantId = participant?._id;
-				const votes = await this.countParticipantVotes(participantId, event._id);
+				const votes = await this.countParticipantVotes(participantId, categoryId);
 				return {
 					participant: {
 						...participant,
@@ -219,21 +244,18 @@ export default class ParticipationService {
 		return { data: allParticipation, paging };
 	}
 
-	public static async getSingleParticipant(eventId: string, participantId: string): Promise<any> {
-		const event = await EventService.getOne({ _id: eventId });
-		if (!event) throw new NotFoundError('Event not found');
-
-		const user = await UserService.getOne({ _id: participantId });
-		if (!user) throw new NotFoundError('User not found');
+	public static async getSingleParticipant(categoryId: ID, participantId: ID): Promise<any> {
+		await CategoryService.exist(categoryId);
+		await UserService.exist(participantId);
 
 		const participation = await ParticipationService.getOne({
-			event: eventId,
+			event: categoryId,
 			user: participantId,
 		});
 		if (!participation) throw new NotFoundError('User is not a participant of the event');
 		const { _id, user: participant, ...otherData } = participation.toObject();
 
-		const votes = await this.countParticipantVotes(participantId, eventId);
+		const votes = await this.countParticipantVotes(participantId, categoryId);
 
 		return {
 			participant: { ...participant, votes },
@@ -242,19 +264,17 @@ export default class ParticipationService {
 	}
 
 	public static async shortlistParticipant(
-		eventId: string,
-		participantId: string
+		categoryId: ID,
+		participantId: ID
 	): Promise<Participation> {
-		const event = await EventService.getOne({ _id: eventId });
-		if (!event) throw new NotFoundError('Event not found');
-
-		const user = await UserService.getOne({ _id: participantId });
-		if (!user) throw new NotFoundError('User not found');
+		await CategoryService.exist(categoryId);
+		await UserService.exist(participantId);
 
 		const participation = await ParticipationService.getOne({
-			event: eventId,
+			category: categoryId,
 			user: participantId,
 		});
+		
 		if (!participation) throw new NotFoundError('User is not a participant of the event');
 		if (participation.status == Status.shortlisted)
 			throw new ConflictError('Participant is already shortlisted');
@@ -264,18 +284,15 @@ export default class ParticipationService {
 		return participation;
 	}
 
-	public static async countParticipantVotes(
-		participantId: string,
-		eventId: string
-	): Promise<number> {
-		const participation = await this.getOne({ user: participantId, event: eventId });
+	public static async countParticipantVotes(participantId: ID, categoryId: ID): Promise<number> {
+		const participation = await this.getOne({ user: participantId, category: categoryId });
 
 		if (!participation) {
 			return 0;
 		}
 		const votes = await VotingService.getForService({
 			participant: participantId,
-			event: eventId,
+			category: categoryId,
 		});
 		const voteCount = votes.reduce((sum: number, vote: Voting) => (sum += vote.votes), 0);
 		return voteCount;

@@ -1,10 +1,12 @@
 import { Document } from 'mongoose';
 import { Event } from './event';
 import { User, Voter } from './user';
+import { ID } from './general';
+import { Category } from './category';
 
 export interface Voting extends Document {
 	voter: Voter;
-	event: Event;
+	category: Category;
 	participant: User;
 	votes: number;
 	paymentRef: string;
@@ -14,6 +16,6 @@ export interface Voting extends Document {
 export interface MetaData {
 	voter: Voter;
 	votes: number;
-	event: string;
-	participant: string;
+	category: Category;
+	participant: User;
 }

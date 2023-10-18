@@ -16,13 +16,9 @@ const eventSchema = new mongoose.Schema({
 		type: String,
 		required: true,
 	},
-	categories: {
-		type: [String],
-		required: true,
-	},
 	reviewStart: { type: Date },
-	contestStart: { type: Date },
-	contestEnd: { type: Date },
+	eventStart: { type: Date },
+	eventEnd: { type: Date },
 	coverImage: {
 		type: {
 			url: String,
@@ -37,6 +33,7 @@ const eventSchema = new mongoose.Schema({
 			_id: false,
 		},
 	},
+	isActive: { type: Boolean, default: false },
 	createdAt: { type: Date, default: Date.now },
 });
 

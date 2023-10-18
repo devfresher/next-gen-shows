@@ -4,17 +4,10 @@ import UserService from './user.service';
 export default class UserController {
 	static async onboarding(req: Request, res: Response, next: NextFunction) {
 		try {
+			const { body: data } = req;
 			const userId = req.user._id.toString();
-			const updateData = {
-				firstName: req.body.firstName,
-				lastName: req.body.lastName,
-				stageName: req.body.stageName,
-				talent: req.body.talent,
-				reason: req.body.reason,
-				portfolio: req.body.portfolio,
-				isOnboard: true,
-			};
-			const user = await UserService.updateUser(userId, updateData);
+
+			const user = await UserService.onboardParticipant(userId, data);
 
 			return res.status(200).json({
 				message: 'Profile update successful',

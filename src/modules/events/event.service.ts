@@ -1,8 +1,8 @@
 import { trim } from 'lodash';
 import { ConflictError, NotFoundError } from '../../errors';
 import { CreateEventInput, Event, UpdateEventInput } from '../../types/event';
-import { FilterQuery, PageFilter } from '../../types/general';
-import EventModel from './event.model';
+import { FilterQuery, ID, PageFilter } from '../../types/general';
+import EventModel from '../../db/models/event.model';
 import { PaginateOptions, PaginateResult } from 'mongoose';
 import Pagination from '../../utils/PaginationUtil';
 import helperUtil from '../../utils/HelperUtil';
@@ -14,6 +14,13 @@ export default class EventService {
 	public static async getOne(filterQuery: FilterQuery): Promise<Event | null> {
 		const event = await this.model.findOne(filterQuery);
 		return event || null;
+	}
+
+	public static async exist(id: ID): Promise<Event> {
+		const event = await this.model.findById(id);
+		if (!event) throw new NotFoundError('Event not found');
+
+		return event;
 	}
 
 	public static async getManyForService(filterQuery: FilterQuery): Promise<Event[]> {
@@ -39,31 +46,19 @@ export default class EventService {
 	}
 
 	public static async create(eventData: CreateEventInput): Promise<Event> {
-		const {
-			eventName,
-			description,
-			categories,
-			eventCover,
-			eventVideo,
-			contestStart,
-			contestEnd,
-		} = eventData;
+		const { eventName, description, eventCover, eventVideo, eventStart, eventEnd } = eventData;
 		const label = helperUtil.getLabel(eventName);
 
 		await this.checkLabel(label);
 
-		const formattedCategories = categories.split(',').map((category) => {
-			return trim(category);
-		});
 		const event = new this.model({
 			eventName,
 			label,
 			description,
-			categories: formattedCategories,
 			coverImage: eventCover,
 			video: eventVideo,
-			contestStart,
-			contestEnd,
+			eventStart,
+			eventEnd,
 		});
 
 		await event.save();
@@ -77,28 +72,29 @@ export default class EventService {
 		const {
 			eventName,
 			description,
-			categories,
 			eventCover,
 			eventVideo,
 			contestStart,
 			contestEnd,
+			isActive,
 		} = updateData;
+
 		const { eventName: previousName, label: previousLabel } = event;
 
-		const label = eventName !== previousName ? helperUtil.getLabel(eventName) : previousLabel;
+		const label =
+			eventName && eventName !== previousName
+				? helperUtil.getLabel(eventName)
+				: previousLabel;
 		if (label !== previousLabel) await this.checkLabel(label);
 
-		const formattedCategories = categories.split(',').map((category) => {
-			return trim(category);
-		});
 		event.eventName = eventName || previousName;
 		event.label = label;
 		event.description = description || event.description;
-		event.categories = formattedCategories;
 		event.coverImage = eventCover || event.coverImage;
 		event.video = eventVideo || event.video;
 		event.contestStart = contestStart || event.contestStart;
 		event.contestEnd = contestEnd || event.contestEnd;
+		event.isActive = isActive;
 
 		await event.save();
 		return event;

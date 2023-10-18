@@ -1,20 +1,20 @@
 import { NextFunction, Request, Response } from 'express';
 import VotingService from './voting.service';
-import { MetaData as VotingMetaData } from '../../../types/voting';
-import PaystackUtil from '../../../utils/PaystackUtil';
-import { config } from '../../../utils/config';
-import { Voter } from '../../../types/user';
+import { MetaData as VotingMetaData } from '../../types/voting';
+import PaystackUtil from '../../utils/PaystackUtil';
+import { config } from '../../utils/config';
+import { Voter } from '../../types/user';
 
 export default class VotingController {
 	static async vote(req: Request, res: Response, next: NextFunction) {
 		try {
-			const { eventId, participantId } = req.params;
+			const { categoryId, participantId } = req.params;
 			const { fullName, email, phoneNumber, numberOfVotes } = req.body;
 			const voter: Voter = { fullName, email, phoneNumber };
 
 			const { authorization_url } = await VotingService.processVoting(
 				voter,
-				eventId,
+				categoryId,
 				participantId,
 				numberOfVotes
 			);

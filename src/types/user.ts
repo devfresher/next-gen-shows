@@ -1,5 +1,7 @@
 import { Document, Types } from 'mongoose';
-import { ImageFile } from './general';
+import { ID, ImageFile } from './general';
+import { Talent } from './talent';
+import { Country } from './country';
 
 export interface User extends Document {
 	firstName?: string;
@@ -7,7 +9,8 @@ export interface User extends Document {
 	fullName?: string;
 	stageName?: string;
 	email: string;
-	talent?: string;
+	talent: Talent | ID;
+	country: Country | ID;
 	portfolio?: string;
 	password?: string;
 	isActive?: boolean;
@@ -35,7 +38,7 @@ export interface UpdateUserInput {
 	firstName?: string;
 	lastName?: string;
 	stageName?: string;
-	talent?: string;
+	talent?: ID;
 	portfolio?: string;
 	password?: string;
 	phoneNumber?: string;

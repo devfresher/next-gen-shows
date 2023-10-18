@@ -1,13 +1,14 @@
 import { Document, Types } from 'mongoose';
 import { Event } from './event';
 import { User } from './user';
+import { ID } from './general';
+import { Category } from './category';
 
 export interface Participation extends Document {
 	user: User;
-	event: Event;
+	category: Category;
 	registeredData: object;
 	multimedia: { url: string; id: string };
-	category: string;
 	paymentRef: string;
 	createdAt: Date;
 	status: Status;
@@ -15,14 +16,13 @@ export interface Participation extends Document {
 
 export interface MetaData {
 	user: string;
-	event: string;
+	categoryId: ID;
 	registeredData: {
 		name: string;
 		email: string;
 		phoneNumber: string;
 		portfolio: string;
 	};
-	category: string;
 	multimedia?: {
 		id?: string;
 		url?: string;

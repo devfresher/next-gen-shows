@@ -1,5 +1,5 @@
 import { Document } from 'mongoose';
-import { VideoUploadResponse, ImageUploadResponse, VideoFile, ImageFile } from './general';
+import { VideoUploadResponse, ImageUploadResponse, VideoFile, ImageFile, ID } from './general';
 
 export interface Event extends Document {
 	eventName: string;
@@ -7,6 +7,7 @@ export interface Event extends Document {
 	description: string;
 	categories: string[];
 	coverImage: ImageFile;
+	isActive?: boolean;
 	video?: VideoFile;
 	createdAt: Date;
 	contestStart: Date;
@@ -16,17 +17,17 @@ export interface Event extends Document {
 export interface CreateEventInput {
 	eventName: string;
 	description: string;
-	categories: string;
 	eventCover: ImageUploadResponse;
 	eventVideo: VideoUploadResponse;
-	contestStart: Date;
-	contestEnd: Date;
+	eventStart: Date;
+	eventEnd: Date;
 }
 
 export interface UpdateEventInput {
 	eventName?: string;
 	description?: string;
 	categories?: string;
+	isActive?: boolean;
 	eventCover?: ImageUploadResponse;
 	eventVideo?: VideoUploadResponse;
 	contestStart?: Date;
@@ -41,4 +42,6 @@ export interface JoinEventInput {
 	category: string;
 	portfolio: string;
 	videoFile?: Express.Multer.File;
+	countryId: ID;
+	talentId: ID;
 }

@@ -1,13 +1,15 @@
-import { FilterQuery, PageFilter } from '../../types/general';
+import { FilterQuery, ID, PageFilter } from '../../types/general';
 import { CreateUserInput, UpdateUserInput, User } from '../../types/user';
-import UserModel from './user.model';
+import UserModel from '../../db/models/user.model';
 import AuthService from '../auth/auth.service';
-import { ConflictError, NotFoundError } from '../../errors';
+import { BadRequestError, ConflictError, NotFoundError } from '../../errors';
 import { sendEmail } from '../mailer/EmailService';
 import { config } from '../../utils/config';
 import { PaginateOptions, PaginateResult } from 'mongoose';
 import Pagination from '../../utils/PaginationUtil';
-import ParticipationService from '../events/participation/participation.service';
+import ParticipationService from '../participation/participation.service';
+import TalentService from '../talent/talent.service';
+import CountryService from '../country/country.service';
 
 export default class UserService {
 	static model = UserModel;
@@ -17,6 +19,13 @@ export default class UserService {
 		const user = await this.model.findOne(filterQuery, projection);
 
 		return user || null;
+	}
+
+	public static async exist(id: ID): Promise<User> {
+		const user = await this.model.findById(id);
+		if (!user) throw new NotFoundError('User not found');
+
+		return user;
 	}
 
 	static async getUserProfile(userId: string): Promise<any> {
@@ -79,6 +88,35 @@ export default class UserService {
 		return user;
 	}
 
+	static async onboardParticipant(userId: string, userData: any): Promise<User> {
+		const { firstName, lastName, stageName, portfolio, talentId, reason, countryId, city } =
+			userData;
+
+		let user = await this.getOne({ _id: userId });
+		if (!user) throw new NotFoundError('User not found');
+
+		const talent = await TalentService.getOne({ _id: talentId });
+		if (!talent) throw new BadRequestError('Invalid Talent');
+
+		const country = await CountryService.getOne({ _id: countryId });
+		if (!country) throw new BadRequestError('Invalid country');
+
+		const updateData = {
+			firstName,
+			lastName,
+			stageName,
+			talent: talentId,
+			reason,
+			portfolio,
+			country: countryId,
+			city,
+			isOnboard: true,
+		};
+
+		user = await this.updateUser(userId, updateData);
+		return user;
+	}
+
 	static async updateUser(userId: string, userData: UpdateUserInput): Promise<User> {
 		const {
 			firstName,
@@ -122,7 +160,13 @@ export default class UserService {
 	public static async profileCompleted(userId: string): Promise<boolean> {
 		const user = await this.getOne({ _id: userId });
 		if (
-			(user?.firstName, user?.lastName && user?.email && user?.phoneNumber && user?.portfolio)
+			user?.firstName &&
+			user?.lastName &&
+			user?.email &&
+			user?.phoneNumber &&
+			user?.portfolio &&
+			user?.country &&
+			user.talent
 		)
 			return true;
 

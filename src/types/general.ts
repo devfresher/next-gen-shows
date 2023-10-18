@@ -1,5 +1,6 @@
 import { Request } from 'express';
 import { JwtPayload } from 'jsonwebtoken';
+import { ObjectId } from 'mongoose';
 
 export interface ResponseData {
 	status: string;
@@ -8,8 +9,10 @@ export interface ResponseData {
 	data: any;
 }
 
+export type ID = string | ObjectId;
+
 export interface FilterQuery {
-	_id?: string;
+	_id?: ID;
 	[key: string]: any;
 }
 

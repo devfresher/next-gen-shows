@@ -1,8 +1,8 @@
 import { NextFunction, Request, Response } from 'express';
 import ParticipationService from './participation.service';
-import PaystackUtil from '../../../utils/PaystackUtil';
-import { config } from '../../../utils/config';
-import { PageFilter } from '../../../types/general';
+import PaystackUtil from '../../utils/PaystackUtil';
+import { config } from '../../utils/config';
+import { PageFilter } from '../../types/general';
 
 export default class ParticipationController {
 	static async getAllParticipant(req: Request, res: Response, next: NextFunction) {
@@ -21,14 +21,14 @@ export default class ParticipationController {
 		}
 	}
 
-	static async getAllParticipationOfEvent(req: Request, res: Response, next: NextFunction) {
+	static async getAllParticipationOfCategory(req: Request, res: Response, next: NextFunction) {
 		try {
-			const { eventId } = req.params;
+			const { categoryId } = req.params;
 			const { page, limit } = req.query;
 
 			const pageFilter: PageFilter = { page: Number(page), limit: Number(limit) };
-			const participantResult = await ParticipationService.getAllParticipationOfEvent(
-				eventId,
+			const participantResult = await ParticipationService.getAllParticipationOfCategory(
+				categoryId,
 				pageFilter
 			);
 
@@ -41,20 +41,21 @@ export default class ParticipationController {
 		}
 	}
 
-	static async getShortlistedParticipationOfEvent(
+	static async getShortlistedParticipationOfCategory(
 		req: Request,
 		res: Response,
 		next: NextFunction
 	) {
 		try {
-			const { eventId } = req.params;
+			const { categoryId } = req.params;
 			const { page, limit } = req.query;
 
 			const pageFilter: PageFilter = { page: Number(page), limit: Number(limit) };
-			const participantResult = await ParticipationService.getShortlistedParticipantOfEvent(
-				eventId,
-				pageFilter
-			);
+			const participantResult =
+				await ParticipationService.getShortlistedParticipantOfCategory(
+					categoryId,
+					pageFilter
+				);
 
 			res.status(200).json({
 				message: 'Shortlisted Participants retrieved successfully',
@@ -67,11 +68,11 @@ export default class ParticipationController {
 
 	static async getSingleParticipant(req: Request, res: Response, next: NextFunction) {
 		try {
-			const { eventId } = req.params;
+			const { categoryId } = req.params;
 			const { participantId } = req.params;
 
 			const participant = await ParticipationService.getSingleParticipant(
-				eventId,
+				categoryId,
 				participantId
 			);
 
@@ -86,11 +87,11 @@ export default class ParticipationController {
 
 	static async markAsShortlisted(req: Request, res: Response, next: NextFunction) {
 		try {
-			const { eventId } = req.params;
+			const { categoryId } = req.params;
 			const { participantId } = req.params;
 
 			const participant = await ParticipationService.shortlistParticipant(
-				eventId,
+				categoryId,
 				participantId
 			);
 

@@ -5,8 +5,8 @@ import AuthMiddleware from '../../middleware/auth';
 import EventValidator from './event.validate';
 import EventController from './event.controller';
 import UploadMiddleware from '../../middleware/fileUpload';
-import ParticipationController from './participation/participation.controller';
-import VotingController from './voting/voting.controller';
+import ParticipationController from '../participation/participation.controller';
+import VotingController from '../voting/voting.controller';
 
 const router = Router();
 
@@ -29,8 +29,8 @@ router.post(
 router.get('/participation/confirm-payment', ParticipationController.confirmPayment);
 
 router.post(
-	'/vote/:eventId/:participantId',
-	ValidationMiddleware.validateObjectIds(['eventId', 'participantId']),
+	'/vote/:categoryId/:participantId',
+	ValidationMiddleware.validateObjectIds(['categoryId', 'participantId']),
 	ValidationMiddleware.validateRequest(EventValidator.vote),
 	VotingController.vote
 );
@@ -45,6 +45,13 @@ router.put(
 	EventController.updateEvent
 );
 
+router.patch(
+	'/:eventId/toggle-active',
+	AuthMiddleware.authenticateAdmin,
+	ValidationMiddleware.validateObjectIds('eventId'),
+	EventController.toggleActive
+);
+
 router.delete(
 	'/:eventId',
 	AuthMiddleware.authenticateAdmin,
@@ -52,22 +59,9 @@ router.delete(
 	EventController.deleteEvent
 );
 
-router.get('/', EventController.getAll);
+router.get('/', AuthMiddleware.authenticateAdmin, EventController.getAll);
 router.get('/upcoming-events', EventController.getUpcomingEvents);
-router.get('/ongoing-events', EventController.getOngoingEvents);
-router.get('/participants', ParticipationController.getAllParticipant);
+router.get('/ongoing-event', EventController.getOngoingEvent);
 router.get('/:eventId', EventController.getOne);
-router.get('/:eventId/participants', ParticipationController.getAllParticipationOfEvent);
-router.get(
-	'/:eventId/participants/shortlisted',
-	ParticipationController.getShortlistedParticipationOfEvent
-);
-router.get('/:eventId/participants/:participantId', ParticipationController.getSingleParticipant);
-
-router.patch(
-	'/:eventId/shortlist/:participantId',
-	AuthMiddleware.authenticateAdmin,
-	ParticipationController.markAsShortlisted
-);
 
 export default router;

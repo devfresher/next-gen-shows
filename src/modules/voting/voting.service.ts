@@ -1,15 +1,16 @@
-import { BadRequestError } from '../../../errors';
-import { Voting, MetaData as VotingMetaData } from '../../../types/voting';
+import { BadRequestError } from '../../errors';
+import { Voting, MetaData as VotingMetaData } from '../../types/voting';
 
-import UserService from '../../user/user.service';
-import EventService from '../event.service';
-import VotingModel from './voting.model';
-import PaystackUtil from '../../../utils/PaystackUtil';
-import { config } from '../../../utils/config';
-import { FilterQuery, PageFilter } from '../../../types/general';
-import { Voter } from '../../../types/user';
+import UserService from '../user/user.service';
+import EventService from '../events/event.service';
+import VotingModel from '../../db/models/voting.model';
+import PaystackUtil from '../../utils/PaystackUtil';
+import { config } from '../../utils/config';
+import { FilterQuery, ID, PageFilter } from '../../types/general';
+import { Voter } from '../../types/user';
 import { PaginateResult, PaginateOptions } from 'mongoose';
-import Pagination from '../../../utils/PaginationUtil';
+import Pagination from '../../utils/PaginationUtil';
+import CategoryService from '../category/category.service';
 
 export default class VotingService {
 	private static model = VotingModel;
@@ -47,13 +48,13 @@ export default class VotingService {
 		paymentMetaData: VotingMetaData,
 		paymentRef: string
 	): Promise<Voting> {
-		let { voter, event, participant, votes } = paymentMetaData;
+		let { voter, category, participant, votes } = paymentMetaData;
 		voter = await UserService.getOne({ email: voter.email });
 		if (!voter) voter = await UserService.createUser({ ...voter, isVoter: true });
 
 		const votingData = {
 			voter: voter._id,
-			event,
+			category,
 			votes,
 			participant,
 			paymentRef,
@@ -66,21 +67,18 @@ export default class VotingService {
 
 	public static async processVoting(
 		voter: Voter,
-		eventId: string,
+		categoryId: ID,
 		participantId: string,
 		votes: number
 	): Promise<{ reference: string; authorization_url: string }> {
-		const participant = await UserService.getOne({ _id: participantId });
-		const event = await EventService.getOne({ _id: eventId });
-
-		if (!participant) throw new BadRequestError('Invalid Participant');
-		if (!event) throw new BadRequestError('Invalid Event');
+		const participant = await UserService.exist(participantId);
+		const category = await CategoryService.exist(categoryId);
 
 		const votingData: VotingMetaData = {
 			voter,
 			votes,
-			event: eventId,
-			participant: participantId,
+			category,
+			participant,
 		};
 		const callbackUrl = `${config.BASE_URL}/events/voting/confirm-payment`;
 		const amountInKobo = `${config.EVENT_VOTE_AMOUNT * 100 * votes}`;

@@ -32,6 +32,22 @@ export default class EventController {
 		}
 	}
 
+	static async toggleActive(req: Request, res: Response, next: NextFunction) {
+		try {
+			const { eventId } = req.params;
+
+			let event = await EventService.getOne({ _id: eventId });
+			event = await EventService.update(eventId, { isActive: !event.isActive });
+
+			res.status(200).json({
+				message: `Event ${event.isActive ? 'activated' : 'deactivated'} successfully`,
+				data: event,
+			});
+		} catch (error) {
+			next(error);
+		}
+	}
+
 	static async deleteEvent(req: Request, res: Response, next: NextFunction) {
 		try {
 			const { eventId } = req.params;
@@ -65,7 +81,7 @@ export default class EventController {
 		try {
 			const { page, limit } = req.query;
 			const now = new Date();
-			let filterQuery: FilterQuery = { contestStart: { $gt: now } };
+			let filterQuery: FilterQuery = { contestStart: { $gt: now }, isActive: false };
 			const pageFilter: PageFilter = { page: Number(page), limit: Number(limit) };
 
 			const events = await EventService.getMany(filterQuery, pageFilter);
@@ -78,19 +94,14 @@ export default class EventController {
 		}
 	}
 
-	static async getOngoingEvents(req: Request, res: Response, next: NextFunction) {
+	static async getOngoingEvent(req: Request, res: Response, next: NextFunction) {
 		try {
-			const { page, limit } = req.query;
-			const now = new Date();
-			let filterQuery: FilterQuery = {
-				$and: [{ contestStart: { $lt: now } }, { contestEnd: { $gt: now } }],
-			};
-			const pageFilter: PageFilter = { page: Number(page), limit: Number(limit) };
+			let filterQuery: FilterQuery = { isActive: true };
 
-			const events = await EventService.getMany(filterQuery, pageFilter);
+			const event = await EventService.getOne(filterQuery);
 			res.status(200).json({
-				message: 'Ongoing events retrieved successfully',
-				data: events,
+				message: 'Ongoing event retrieved successfully',
+				data: event,
 			});
 		} catch (error) {
 			next(error);
@@ -100,9 +111,8 @@ export default class EventController {
 	static async getOne(req: Request, res: Response, next: NextFunction) {
 		try {
 			const { eventId } = req.params;
-			let filterQuery: FilterQuery = { _id: eventId };
 
-			const event = await EventService.getOne(filterQuery);
+			const event = await EventService.exist(eventId);
 			res.status(200).json({
 				message: 'Event retrieved successfully',
 				data: event.toObject(),

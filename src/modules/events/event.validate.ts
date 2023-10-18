@@ -6,7 +6,6 @@ export default class EventValidator {
 		const validationSchema = Joi.object({
 			eventName: Joi.string().required().trim().label('Event Name'),
 			description: Joi.string().required().trim().min(5).label('Description'),
-			categories: Joi.string().required().trim().label('Categories'),
 			eventCover: Joi.object({
 				imageId: Joi.string().required().trim().label('Image ID'),
 				url: Joi.string().uri().required().trim().label('URL'),
@@ -15,8 +14,8 @@ export default class EventValidator {
 				videoId: Joi.string().trim().label('Video ID'),
 				url: Joi.string().uri().trim().label('URL'),
 			}).label('Event Video'),
-			contestStart: Joi.date().greater('now').raw().label('Contest start date'),
-			contestEnd: Joi.date().greater(Joi.ref('contestStart')).raw().label('Contest end date'),
+			eventStart: Joi.date().greater('now').raw().label('Event start date'),
+			eventEnd: Joi.date().greater(Joi.ref('eventStart')).raw().label('Event end date'),
 		});
 
 		return validationSchema.validate(req.body, options);
@@ -52,7 +51,16 @@ export default class EventValidator {
 					}),
 				otherwise: Joi.forbidden(),
 			}),
-			category: Joi.string().trim().required().label('Category'),
+			talentId: Joi.when('useAsOnProfile', {
+				is: false,
+				then: Joi.string().required().trim().label('Talent/Skill'),
+				otherwise: Joi.forbidden(),
+			}),
+			countryId: Joi.when('useAsOnProfile', {
+				is: false,
+				then: Joi.string().trim().required().label('Country'),
+				otherwise: Joi.forbidden(),
+			}),
 		});
 
 		return validationSchema.validate(req.body, options);
@@ -80,7 +88,6 @@ export default class EventValidator {
 		const validationSchema = Joi.object({
 			eventName: Joi.string().trim().label('Event Name'),
 			description: Joi.string().trim().min(5).label('Description'),
-			categories: Joi.string().trim().label('Categories'),
 			eventCover: Joi.object({
 				imageId: Joi.string().trim().label('Image ID'),
 				url: Joi.string().uri().trim().label('URL'),
@@ -89,8 +96,8 @@ export default class EventValidator {
 				videoId: Joi.string().trim().label('Video ID'),
 				url: Joi.string().uri().trim().label('URL'),
 			}).label('Event Video'),
-			contestStart: Joi.date().greater('now').raw().label('Contest start date'),
-			contestEnd: Joi.date().greater(Joi.ref('contestStart')).raw().label('Contest end date'),
+			eventStart: Joi.date().greater('now').raw().label('Event start date'),
+			eventEnd: Joi.date().greater(Joi.ref('eventStart')).raw().label('Event end date'),
 		});
 
 		return validationSchema.validate(req.body, options);

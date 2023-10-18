@@ -12,8 +12,10 @@ export default class UserValidator {
 				.trim()
 				.label('Reason for Joining')
 				.valid(...['To build career', 'Get recognition', 'Get endorsement', 'Others']),
-			talent: Joi.string().required().trim().label('Talent/Skill'),
+			talentId: Joi.string().required().trim().label('Talent/Skill'),
+			countryId: Joi.string().trim().required().label('Country'),
 			portfolio: Joi.string().uri().trim().label('Portfolio'),
+			city: Joi.string().trim().required().label('State/City'),
 		});
 
 		return validationSchema.validate(req.body, options);
@@ -24,8 +26,6 @@ export default class UserValidator {
 			firstName: Joi.string().trim().label('First Name'),
 			lastName: Joi.string().trim().label('Last Name'),
 			stageName: Joi.string().trim().label('Stage Name'),
-			country: Joi.string().trim().label('Country'),
-			city: Joi.string().trim().label('State/City'),
 			phoneNumber: Joi.string()
 				.regex(/^(\+?234|0)[\d]{10}$/)
 				.trim()

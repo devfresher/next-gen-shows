@@ -36,8 +36,7 @@ export default class EventController {
 		try {
 			const { eventId } = req.params;
 
-			let event = await EventService.getOne({ _id: eventId });
-			event = await EventService.update(eventId, { isActive: !event.isActive });
+			const event = await EventService.toggleActive(eventId);
 
 			res.status(200).json({
 				message: `Event ${event.isActive ? 'activated' : 'deactivated'} successfully`,

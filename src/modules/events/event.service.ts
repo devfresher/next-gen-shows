@@ -27,6 +27,17 @@ export default class EventService {
 		return await this.model.find(filterQuery);
 	}
 
+	public static async toggleActive(eventId: ID): Promise<Event> {
+		let event = await this.getOne({ _id: eventId });
+		if (!event.isActive) {
+			const activeEvent = await this.getOne({ isActive: true });
+			if (activeEvent) throw new ConflictError('An event is currently active');
+		}
+
+		event = await this.update(eventId, { isActive: !event.isActive });
+		return event;
+	}
+
 	public static async getMany(
 		filterQuery: FilterQuery,
 		pageFilter?: PageFilter
@@ -65,7 +76,7 @@ export default class EventService {
 		return event;
 	}
 
-	public static async update(eventId: string, updateData: UpdateEventInput): Promise<Event> {
+	public static async update(eventId: ID, updateData: UpdateEventInput): Promise<Event> {
 		let event = await this.getOne({ _id: eventId });
 		if (!event) throw new NotFoundError(`Event not found`);
 

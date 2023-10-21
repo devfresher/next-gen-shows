@@ -16,7 +16,9 @@ export default class CategoryService {
 	private static model = CategoryModel;
 
 	public static async getOne(filterQuery: FilterQuery): Promise<Category | null> {
-		const category = await this.model.findOne(filterQuery);
+		const category = await this.model
+			.findOne(filterQuery)
+			.populate(['event', 'talent', 'country']);
 		return category || null;
 	}
 

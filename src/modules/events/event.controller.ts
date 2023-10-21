@@ -77,23 +77,6 @@ export default class EventController {
 		}
 	}
 
-	static async getUpcomingEvents(req: Request, res: Response, next: NextFunction) {
-		try {
-			const { page, limit } = req.query;
-			const now = new Date();
-			let filterQuery: FilterQuery = { contestStart: { $gt: now }, isActive: false };
-			const pageFilter: PageFilter = { page: Number(page), limit: Number(limit) };
-
-			const events = await EventService.getMany(filterQuery, pageFilter);
-			res.status(200).json({
-				message: 'Upcoming events retrieved successfully',
-				data: events,
-			});
-		} catch (error) {
-			next(error);
-		}
-	}
-
 	static async getOngoingEvent(req: Request, res: Response, next: NextFunction) {
 		try {
 			let filterQuery: FilterQuery = { isActive: true };

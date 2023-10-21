@@ -60,7 +60,6 @@ router.delete(
 );
 
 router.get('/', AuthMiddleware.authenticateAdmin, EventController.getAll);
-router.get('/upcoming-events', EventController.getUpcomingEvents);
 router.get('/ongoing-event', EventController.getOngoingEvent);
 router.get('/:eventId', EventController.getOne);
 

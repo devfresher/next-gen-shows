@@ -27,7 +27,7 @@ class FileUploadUtil {
 				},
 			}),
 			fileFilter: (req: Request, file, cb) => {
-				const ext = path.extname(file.originalname);				
+				const ext = path.extname(file.originalname);
 				if (!formats.includes(ext)) {
 					req.fileValidationError = `Unsupported file format. Expecting ${formats.join(
 						', '
@@ -52,7 +52,7 @@ class FileUploadUtil {
 		format: string,
 		destination: string = 'tempUploads'
 	): RequestHandler {
-		const absDestination = path.resolve(process.cwd(), destination);		
+		const absDestination = path.resolve(process.cwd(), destination);
 		this.createFolder(absDestination);
 		const upload = this.createMulter(fieldName, this.supportedFormats[format], destination);
 

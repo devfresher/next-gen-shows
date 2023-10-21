@@ -18,6 +18,7 @@ router.post(
 	'/upload-video',
 	AuthMiddleware.authenticateToken,
 	UploadMiddleware.uploadSingleVideo('video'),
+	UploadMiddleware.validateUploadedFile,
 	OtherController.uploadVideo
 );
 
@@ -25,6 +26,7 @@ router.post(
 	'/upload-image',
 	AuthMiddleware.authenticateToken,
 	UploadMiddleware.uploadSingleImage('image'),
+	UploadMiddleware.validateUploadedFile,
 	OtherController.uploadImage
 );
 

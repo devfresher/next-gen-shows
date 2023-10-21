@@ -1,5 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
 import OtherService from './other.service';
+import { BadRequestError } from '../../errors';
 
 export default class OtherController {
 	static async submitContactForm(req: Request, res: Response, next: NextFunction) {

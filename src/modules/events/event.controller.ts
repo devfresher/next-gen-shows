@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from 'express';
 import EventService from './event.service';
 import { FilterQuery, PageFilter } from '../../types/general';
+import CategoryService from '../category/category.service';
 
 export default class EventController {
 	static async createEvent(req: Request, res: Response, next: NextFunction) {

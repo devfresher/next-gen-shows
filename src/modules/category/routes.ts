@@ -31,5 +31,6 @@ router.delete(
 
 router.get('/', AuthMiddleware.authenticateAdmin, CategoryController.getAll);
 router.get('/:categoryId', CategoryController.get);
+router.get('/event/:eventId', CategoryController.getAllEventCategories);
 
 export default router;

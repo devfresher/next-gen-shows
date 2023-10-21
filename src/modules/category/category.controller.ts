@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from 'express';
 import CategoryService from './category.service';
 import { FilterQuery, PageFilter } from '../../types/general';
+import EventService from '../events/event.service';
 
 export default class CategoryController {
 	static async index(req: Request, res: Response, next: NextFunction) {
@@ -42,6 +43,26 @@ export default class CategoryController {
 			const categories = await CategoryService.getMany(filterQuery, pageFilter);
 			res.status(200).json({
 				message: 'Categories retrieved successfully',
+				data: categories,
+			});
+		} catch (error) {
+			next(error);
+		}
+	}
+
+	static async getAllEventCategories(req: Request, res: Response, next: NextFunction) {
+		try {
+			const {
+				params: { eventId },
+				query: { page, limit },
+			} = req;
+			const pageFilter: PageFilter = { page: Number(page), limit: Number(limit) };
+
+			await EventService.exist(eventId);
+			const categories = await CategoryService.getMany({ event: eventId }, pageFilter);
+
+			res.status(200).json({
+				message: 'All event categories retrieved successfully',
 				data: categories,
 			});
 		} catch (error) {

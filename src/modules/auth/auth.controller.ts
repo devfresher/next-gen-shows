@@ -9,7 +9,7 @@ export default class AuthController {
 
 			const user = await UserService.createUser(userData);
 			res.status(200).json({
-				message: 'Activation email sent',
+				message: 'Registration successful. An activation email has sent',
 				data: user,
 			});
 		} catch (error) {

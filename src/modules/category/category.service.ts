@@ -71,7 +71,7 @@ export default class CategoryService {
 		});
 
 		await category.save();
-		return category;
+		return await category.populate(['event', 'talent', 'country']);
 	}
 
 	public static async update(categoryId: ID, updateData: UpdateCategoryInput): Promise<Category> {

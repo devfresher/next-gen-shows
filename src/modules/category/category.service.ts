@@ -45,7 +45,7 @@ export default class CategoryService {
 			limit,
 			pagination: paginate,
 			populate: ['event', 'talent', 'country'],
-		};\
+		};
 
 		return await this.model.paginate(filterQuery, paginateOption);
 	}

@@ -14,11 +14,10 @@ export default class AuthService {
 		let user = await UserService.getOne({ email }, false);
 
 		if (!user) throw new BadRequestError('Incorrect email or password');
-
-		if (!user.isActive)
-			throw new ForbiddenError(
-				'Your account has been not been verified kindly verify via the email sent.'
-			);
+		if (!user.isAdmin) {
+			this.isDeactivated(user);
+			this.isVerified(user);
+		}
 
 		const isValidPassword = await bcrypt.compare(password, user.password);
 		if (!isValidPassword) throw new BadRequestError('Incorrect email or password');
@@ -29,11 +28,23 @@ export default class AuthService {
 		return { user, accessToken };
 	}
 
+	static isDeactivated(user: User) {
+		if (!user.isActive)
+			throw new ForbiddenError('Your account has been deactivated. Contact admin');
+	}
+
+	static isVerified(user: User) {
+		if (!user.emailVerified)
+			throw new ForbiddenError(
+				'Your account has been not been verified kindly verify via the email sent.'
+			);
+	}
+
 	static async activateUser(activationToken: string): Promise<User> {
 		if (!activationToken) throw new BadRequestError('No activation token provided', 'web');
 
 		const isRevoked = await RedisUtil.isTokenRevoked(activationToken);
-		if (isRevoked) throw new UnauthorizedError('You are using a revoked token', 'web');
+		if (isRevoked) throw new UnauthorizedError('Token has been revoked or expired', 'web');
 
 		const decodedToken = jwt.verify(
 			activationToken,

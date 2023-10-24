@@ -4,6 +4,7 @@ import ValidationMiddleware from '../../middleware/validate';
 import AuthMiddleware from '../../middleware/auth';
 import CategoryValidator from './category.validate';
 import CategoryController from './category.controller';
+import ParticipationController from '../participation/participation.controller';
 
 const router = Router();
 
@@ -31,6 +32,11 @@ router.delete(
 
 router.get('/', AuthMiddleware.authenticateAdmin, CategoryController.getAll);
 router.get('/:categoryId', CategoryController.get);
+router.get('/:categoryId/participants', ParticipationController.getAllParticipationOfCategory);
+router.get(
+	'/:categoryId/shortlisted-1',
+	ParticipationController.getShortlistedParticipationOfCategory
+);
 router.get('/event/:eventId', CategoryController.getAllEventCategories);
 
 export default router;

@@ -3,6 +3,8 @@ import ParticipationService from './participation.service';
 import PaystackUtil from '../../utils/PaystackUtil';
 import { config } from '../../utils/config';
 import { PageFilter } from '../../types/general';
+import { JoinEventInput } from '../../types/event';
+import { MetaData } from '../../types/participation';
 
 export default class ParticipationController {
 	static async getAllParticipant(req: Request, res: Response, next: NextFunction) {
@@ -41,6 +43,25 @@ export default class ParticipationController {
 		}
 	}
 
+	static async getAllParticipationOfEvent(req: Request, res: Response, next: NextFunction) {
+		try {
+			const { eventId } = req.params;
+			const { page, limit } = req.query;
+
+			const pageFilter: PageFilter = { page: Number(page), limit: Number(limit) };
+			const participantResult = await ParticipationService.getAllParticipationOfEvent(
+				eventId,
+				pageFilter
+			);
+
+			res.status(200).json({
+				message: 'All Participants retrieved successfully',
+				data: participantResult,
+			});
+		} catch (error) {
+			next(error);
+		}
+	}
 	static async getShortlistedParticipationOfCategory(
 		req: Request,
 		res: Response,
@@ -106,9 +127,11 @@ export default class ParticipationController {
 
 	static async joinEvent(req: Request, res: Response, next: NextFunction) {
 		try {
-			const userId = req.user._id;
-			const { eventId } = req.params;
-			const data = { ...req.body, videoFile: req.file };
+			const {
+				user: { _id: userId },
+				params: { eventId },
+				body: data,
+			} = req;
 
 			const { authorization_url } = await ParticipationService.processJoinEvent(
 				userId,
@@ -128,7 +151,7 @@ export default class ParticipationController {
 		try {
 			const reference = req.query.reference as string;
 			const { metadata, status, amount } = await PaystackUtil.verifyPayment(reference);
-			const participationMetadata = metadata as any;
+			const participationMetadata = metadata as unknown as MetaData;
 
 			if (status == 'success') {
 				if (amount == config.EVENT_JOIN_AMOUNT * 100) {
@@ -150,7 +173,7 @@ export default class ParticipationController {
 				res.send('Payment Failed, try again');
 			}
 		} catch (error) {
-			res.status(500).send('Error confirming payment');
+			next(error);
 		}
 	}
 }

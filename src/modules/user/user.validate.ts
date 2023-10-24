@@ -12,8 +12,10 @@ export default class UserValidator {
 				.trim()
 				.label('Reason for Joining')
 				.valid(...['To build career', 'Get recognition', 'Get endorsement', 'Others']),
-			talentId: Joi.string().required().trim().label('Talent/Skill'),
-			countryId: Joi.string().trim().required().label('Country'),
+			talentId: Joi.objectId().trim().required().label('Talent/Skill'),
+			countryId: Joi.objectId().trim().required().label('Country'),
+			validIdUrl: Joi.string().trim().required().label('Valid Id'),
+			idNumber: Joi.string().trim().required().label('ID Number'),
 			portfolio: Joi.string().uri().trim().label('Portfolio'),
 			city: Joi.string().trim().required().label('State/City'),
 		});
@@ -37,6 +39,11 @@ export default class UserValidator {
 				imageId: Joi.string().trim().label('Image ID'),
 				url: Joi.string().uri().trim().label('URL'),
 			}).label('Profile Image'),
+			city: Joi.string().trim().label('State/City'),
+			countryId: Joi.objectId().trim().label('Country'),
+			validIdUrl: Joi.string().trim().label('Valid Id'),
+			idNumber: Joi.string().trim().label('ID Number'),
+			talentId: Joi.objectId().trim().label('Talent/Skill'),
 		});
 
 		return validationSchema.validate(req.body, options);

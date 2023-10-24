@@ -12,7 +12,7 @@ export const config = {
 	APP_NAME: `Next Gen Show ${env.toUpperCase()}`,
 	APP_LOGO: 'https://',
 	HOST: process.env.HOST,
-	PORT: parseInt(process.env.PORT),
+	PORT: process.env.PORT as unknown as number,
 	BASE_URL: process.env.BASE_URL,
 
 	REDIS_HOST: process.env.REDIS_HOST,

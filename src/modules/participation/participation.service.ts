@@ -11,7 +11,7 @@ import ParticipationModel from '../../db/models/participation.model';
 import { MetaData as ParticipationData } from '../../types/participation';
 import PaystackUtil from '../../utils/PaystackUtil';
 import { config } from '../../utils/config';
-import { PaginateResult } from 'mongoose';
+import { PaginateResult, PopulateOption, PopulateOptions } from 'mongoose';
 import { PaginateOptions } from 'mongoose';
 import Pagination from '../../utils/PaginationUtil';
 import VotingService from '../voting/voting.service';
@@ -24,16 +24,17 @@ import CategoryService from '../category/category.service';
 
 export default class ParticipationService {
 	private static model = ParticipationModel;
-	private static populatingData = [{ path: 'user' }, { path: 'event' }];
+	private static populatingData = ['user', 'category'];
 
 	public static async getOne(filterQuery: FilterQuery): Promise<Participation | null> {
-		const participation = await this.model.findOne(filterQuery).populate(this.populatingData);
+		const participation = await this.model.findOne(filterQuery);
 		return participation || null;
 	}
 
 	public static async getMany(
 		filterQuery: FilterQuery,
-		pageFilter?: PageFilter
+		pageFilter?: PageFilter,
+		populatingData?: PopulateOptions[]
 	): Promise<PaginateResult<Participation>> {
 		const { page, limit } = pageFilter;
 		const paginate = !(!page || !limit);
@@ -44,7 +45,7 @@ export default class ParticipationService {
 			page,
 			limit,
 			pagination: paginate,
-			populate: this.populatingData,
+			populate: populatingData || this.populatingData,
 		};
 
 		return await this.model.paginate(filterQuery, paginateOption);
@@ -58,76 +59,63 @@ export default class ParticipationService {
 		paymentMetaData: ParticipationData,
 		paymentRef: string
 	): Promise<Participation> {
-		let { user, categoryId, registeredData, multimedia } = paymentMetaData;
+		let { userId, categoryId, registeredData, multimedia } = paymentMetaData;
 		await CategoryService.exist(categoryId);
 
 		const participationData = {
-			user,
-			categoryId,
+			user: userId,
+			category: categoryId,
 			registeredData,
 			multimedia,
 			paymentRef,
 		};
 
-		const newParticipation = new this.model(participationData);
-		await newParticipation.save();
-		return await this.getOne({ _id: newParticipation._id.toString() });
+		const newParticipation = await (
+			await this.model.create(participationData)
+		).populate(this.populatingData);
+		return newParticipation;
 	}
 
 	public static async processJoinEvent(
-		userId: string,
-		eventId: string,
+		userId: ID,
+		eventId: ID,
 		data: JoinEventInput
 	): Promise<any> {
-		let {
-			fullName,
-			email,
-			phoneNumber,
-			portfolio,
-			useAsOnProfile,
-			videoFile,
-			talentId,
-			countryId,
-		} = data;
-		let videoUploaded: cloud.UploadApiResponse;
+		let { fullName, email, phoneNumber, portfolio, useAsOnProfile, talentId, inActionVideo } =
+			data;
 
-		const user = await UserService.getOne({ _id: userId });
-		const event = await EventService.getOne({ _id: eventId });
+		const user = await (await UserService.exist(userId)).populate(['talent', 'country']);
+		await EventService.exist(eventId);
 
-		if (!user) throw new BadRequestError('Invalid User');
-		if (!event) throw new BadRequestError('Invalid Event');
+		await TalentService.exist(talentId);
 
 		if (useAsOnProfile === true) {
-			const profileCompleted = await UserService.profileCompleted(userId);
-			if (!profileCompleted) throw new BadRequestError('Profile not completed');
+			await UserService.profileCompleted(user);
 
 			fullName = `${user.firstName} ${user.lastName}`;
 			phoneNumber = user.phoneNumber;
 			email = user.email;
 			portfolio = user.portfolio;
-			talentId = (user.talent as Talent)._id;
-			countryId = (user.country as Country)._id;
 		}
 
-		const talent = await TalentService.exist(talentId);
-		const country = await CountryService.exist(countryId);
+		const countryId = (user.country as Country)?._id;
+		if (!countryId) throw new BadRequestError('Update your country on your profile');
+		await CountryService.exist(countryId);
+
 		const category = await CategoryService.getOne({
 			talent: talentId,
 			country: countryId,
 			event: eventId,
 		});
+
 		if (!category)
-			throw new BadRequestError('No category matches the talent-country selection');
+			throw new BadRequestError('No category matches your talent-country selection');
 
-		if (videoFile) {
-			videoUploaded = await CloudinaryUtil.upload(videoFile.path, 'video', 'in_action_video');
-		}
-
-		const participation = await this.getOne({ user: userId, event: eventId });
+		const participation = await this.getOne({ user: userId, category: category._id });
 		if (participation) throw new ConflictError('You already registered for this event');
 
 		const participationData: ParticipationData = {
-			user: userId,
+			userId,
 			categoryId: category._id,
 			registeredData: {
 				name: fullName,
@@ -136,8 +124,8 @@ export default class ParticipationService {
 				portfolio,
 			},
 			multimedia: {
-				id: videoUploaded?.asset_id,
-				url: videoUploaded?.secure_url,
+				id: inActionVideo?.videoId,
+				url: inActionVideo?.url,
 			},
 		};
 		const callbackUrl = `${config.BASE_URL}/events/participation/confirm-payment`;
@@ -153,6 +141,36 @@ export default class ParticipationService {
 		} = initializedPayment;
 
 		return { reference, authorization_url };
+	}
+
+	public static async getAllParticipationOfEvent(
+		eventId: ID,
+		pageFilter: PageFilter
+	): Promise<any> {
+		await EventService.exist(eventId);
+
+		const populatingData: PopulateOptions[] = [
+			{
+				path: 'category',
+				populate: [
+					{
+						path: 'event',
+						match: { _id: eventId },
+					},
+				],
+			},
+		];
+
+		const { data, paging } = await this.getMany({}, pageFilter, populatingData);
+		const participationData = data as Participation[];
+
+		const participationPromise = participationData.map(async (participation) => {
+			const { _id, user: participant, ...otherData } = participation.toObject();
+			return { participant, ...otherData };
+		});
+
+		const allParticipation = await Promise.all(participationPromise);
+		return { data: allParticipation, paging };
 	}
 
 	public static async getAllParticipationOfCategory(
@@ -221,14 +239,13 @@ export default class ParticipationService {
 	public static async getAllParticipation(pageFilter: PageFilter): Promise<any> {
 		const { data, paging } = await this.getMany({}, pageFilter);
 		const participationData = data as Participation[];
-
 		const participationPromise = participationData.map(async (participation) => {
 			const { _id, user: participant, ...otherData } = participation.toObject();
-			const { event } = otherData;
+			const { category } = otherData;
 
 			if (participant) {
 				const participantId = participant?._id;
-				const votes = await this.countParticipantVotes(participantId, event._id);
+				const votes = await this.countParticipantVotes(participantId, category?._id);
 				return {
 					participant: {
 						...participant,
@@ -274,7 +291,7 @@ export default class ParticipationService {
 			category: categoryId,
 			user: participantId,
 		});
-		
+
 		if (!participation) throw new NotFoundError('User is not a participant of the event');
 		if (participation.status == Status.shortlisted)
 			throw new ConflictError('Participant is already shortlisted');

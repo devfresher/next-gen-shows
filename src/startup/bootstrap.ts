@@ -1,37 +1,69 @@
-import { Express } from "express"
-import winston from "winston"
-import http from "http"
+import asyncErrors from 'express-async-errors';
+import express, { Express, urlencoded } from 'express';
+import winston from 'winston';
 
-import logger from "./logger"
-import routeApp from "./routes"
-import { connectDB } from "./db"
-import { config } from "../utils/config"
+import logger from './logger';
+import routeApp from './routes';
+import { connectDB } from './db';
+import bodyParser from 'body-parser';
+import helmet from 'helmet';
+import cors, { CorsOptions } from 'cors';
+import ResponseMiddleware from '../middleware/response';
+import { Connection } from 'mongoose';
+import { NotFoundError } from '../errors';
 
-export default async (app: Express) => {
-	logger()
+export default class Server {
+	private app: Express;
+	private port: number;
+	private name: string;
+	private host: string;
+	private db: Connection;
+	private corsOptions: CorsOptions;
 
-	const { PORT, HOST, APP_NAME } = config
-	const server = http.createServer(app)
-	routeApp(app)
+	constructor(name: string, host: string, port: number) {
+		this.app = express();
+		this.name = name;
+		this.host = host;
+		this.port = port || 3000;
+		this.corsOptions = {
+			origin: '*',
+			methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+		};
 
-	try {
-		await connectDB()
-		server.listen(PORT, HOST, () => {
-			winston.info(`${APP_NAME}'s Server started at http://${HOST}:${PORT}`)
-		})
-	} catch (err) {
-		config.DEBUG(err)
+		logger();
+		this.db = connectDB();
+		this.initializeMiddlewaresAndRoutes();
+
+		['SIGINT', 'SIGUSR1', 'SIGUSR2', 'uncaughtException', 'SIGTERM'].forEach((signal) => {
+			process.on(signal, async (err) => {
+				if (err) winston.error(`${signal}: Error bootstrapping application`, err);
+				this.db.close(() => {
+					winston.info('MongoDB connection closed due to app termination');
+					process.exit(0);
+				});
+			});
+		});
 	}
 
-	server.on("error", (e: NodeJS.ErrnoException) => {
-		if (e.code === "EADDRINUSE") {
-			winston.info("Address in use, retrying...")
-			setTimeout(() => {
-				server.close()
-				server.listen(PORT, HOST, () => {
-					winston.info(`${APP_NAME}'s Server started at http://${HOST}:${PORT}`)
-				})
-			}, 1000)
-		}
-	})
+	initializeMiddlewaresAndRoutes() {
+		this.app.use(bodyParser.json());
+		this.app.use(urlencoded({ extended: false }));
+		this.app.use(helmet());
+		this.app.use(cors());
+
+		routeApp(this.app);
+
+		this.app.all('*', (req, res, next) => {
+			throw new NotFoundError(
+				`You missed the road. Can not ${req.method} ${req.originalUrl} on this server `
+			);
+		});
+		this.app.use(ResponseMiddleware.errorHandler);
+	}
+
+	start() {
+		this.app.listen(this.port, () => {
+			winston.info(`${this.name}'s Server started at http://${this.host}:${this.port}`);
+		});
+	}
 }

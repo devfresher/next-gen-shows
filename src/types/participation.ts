@@ -15,7 +15,7 @@ export interface Participation extends Document {
 }
 
 export interface MetaData {
-	user: string;
+	userId: ID;
 	categoryId: ID;
 	registeredData: {
 		name: string;

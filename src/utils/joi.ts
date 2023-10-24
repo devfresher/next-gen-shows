@@ -1,21 +1,27 @@
-import joi from "joi"
-import { isValidObjectId } from "mongoose"
-
-export const objectIdValidator = (value: string, helpers: joi.CustomHelpers<any>) => {
-	if (!isValidObjectId(value)) {
-		return helpers.error("any.invalid")
-	}
-	return value
-}
+import joi from 'joi';
+import { isValidObjectId } from 'mongoose';
+export { ValidationResult } from 'joi';
 
 export const options = {
 	errors: {
 		wrap: {
-			label: "",
+			label: '',
 		},
 	},
 	abortEarly: false,
-}
+};
 
-export { ValidationResult } from "joi"
-export default joi
+const extendedJoi: joi.Root = joi.extend((joi) => ({
+	type: 'objectId',
+	base: joi.string(),
+	messages: {
+		'objectId.invalid': '{{#label}} must be a valid {{#label}} Id',
+	},
+	validate(value, helpers) {
+		if (!isValidObjectId(value)) {
+			return { value, errors: helpers.error('objectId.invalid') };
+		}
+	},
+}));
+
+export default extendedJoi;

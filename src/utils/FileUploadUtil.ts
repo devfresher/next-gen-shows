@@ -3,6 +3,7 @@ import path from 'path';
 import fs from 'fs';
 import { NextFunction, Request, RequestHandler, Response } from 'express';
 import { BadRequestError } from '../errors';
+import UploadMiddleware from '../middleware/fileUpload';
 
 class FileUploadUtil {
 	private supportedFormats = {

@@ -1,4 +1,4 @@
-import mongoose from 'mongoose';
+import mongoose, { Types } from 'mongoose';
 import paginate from 'mongoose-paginate-v2';
 import { User } from '../../types/user';
 import { PaginateModel } from 'mongoose';
@@ -16,7 +16,7 @@ const userSchema = new mongoose.Schema({
 	stageName: {
 		type: String,
 	},
-	talent: { type: String },
+	talent: { type: Types.ObjectId, ref: 'Talent' },
 	portfolio: { type: String },
 	email: {
 		type: String,
@@ -28,7 +28,7 @@ const userSchema = new mongoose.Schema({
 	},
 	isActive: {
 		type: Boolean,
-		default: false,
+		default: true,
 	},
 	emailVerified: {
 		type: Boolean,
@@ -41,7 +41,7 @@ const userSchema = new mongoose.Schema({
 	reason: String,
 	phoneNumber: String,
 	city: String,
-	country: String,
+	country: { type: Types.ObjectId, ref: 'Country' },
 	passwordReset: {
 		type: {
 			token: String,

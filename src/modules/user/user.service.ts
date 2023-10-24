@@ -1,5 +1,5 @@
 import { FilterQuery, ID, PageFilter } from '../../types/general';
-import { CreateUserInput, UpdateUserInput, User } from '../../types/user';
+import { CreateUserInput, OnboardData, UpdateUserInput, User } from '../../types/user';
 import UserModel from '../../db/models/user.model';
 import AuthService from '../auth/auth.service';
 import { BadRequestError, ConflictError, NotFoundError } from '../../errors';
@@ -88,20 +88,25 @@ export default class UserService {
 		return user;
 	}
 
-	static async onboardParticipant(userId: string, userData: any): Promise<User> {
-		const { firstName, lastName, stageName, portfolio, talentId, reason, countryId, city } =
-			userData;
+	static async onboardParticipant(userId: string, userData: OnboardData): Promise<User> {
+		const {
+			firstName,
+			lastName,
+			stageName,
+			portfolio,
+			talentId,
+			reason,
+			countryId,
+			city,
+			idNumber,
+			validId,
+		} = userData;
 
-		let user = await this.getOne({ _id: userId });
-		if (!user) throw new NotFoundError('User not found');
+		let user = await this.exist(userId);
+		await TalentService.exist(talentId);
+		await CountryService.exist(countryId);
 
-		const talent = await TalentService.getOne({ _id: talentId });
-		if (!talent) throw new BadRequestError('Invalid Talent');
-
-		const country = await CountryService.getOne({ _id: countryId });
-		if (!country) throw new BadRequestError('Invalid country');
-
-		const updateData = {
+		const updateData: UpdateUserInput = {
 			firstName,
 			lastName,
 			stageName,
@@ -111,6 +116,8 @@ export default class UserService {
 			country: countryId,
 			city,
 			isOnboard: true,
+			validId,
+			idNumber,
 		};
 
 		user = await this.updateUser(userId, updateData);
@@ -131,6 +138,8 @@ export default class UserService {
 			city,
 			isOnboard,
 			profileImage,
+			idNumber,
+			validId,
 		} = userData;
 
 		let user = await this.getOne({ _id: userId });
@@ -151,14 +160,15 @@ export default class UserService {
 				city,
 				isOnboard,
 				profileImage,
+				validId,
+				idNumber,
 			}
 		);
 		user = await this.getOne({ _id: userId });
 		return user;
 	}
 
-	public static async profileCompleted(userId: string): Promise<boolean> {
-		const user = await this.getOne({ _id: userId });
+	public static async profileCompleted(user: User): Promise<User> {
 		if (
 			user?.firstName &&
 			user?.lastName &&
@@ -168,8 +178,8 @@ export default class UserService {
 			user?.country &&
 			user.talent
 		)
-			return true;
+			return user;
 
-		return false;
+		throw new BadRequestError('Profile not completed');
 	}
 }

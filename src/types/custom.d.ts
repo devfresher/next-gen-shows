@@ -8,6 +8,18 @@ declare module 'express' {
 	}
 }
 
+declare module 'joi' {
+	export interface Root {
+		objectId(): StringSchema;
+	}
+}
+
+declare module 'jsonwebtoken' {
+	export interface JwtPayload {
+		_id: string;
+		isAdmin: boolean;
+	}
+}
 
 type CustomJwtPayload = JwtPayload & {
 	_id: string;

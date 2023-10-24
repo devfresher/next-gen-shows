@@ -7,6 +7,7 @@ import EventController from './event.controller';
 import UploadMiddleware from '../../middleware/fileUpload';
 import ParticipationController from '../participation/participation.controller';
 import VotingController from '../voting/voting.controller';
+import CategoryController from '../category/category.controller';
 
 const router = Router();
 
@@ -21,7 +22,6 @@ router.post(
 	'/join/:eventId',
 	AuthMiddleware.authenticateToken,
 	ValidationMiddleware.validateObjectIds('eventId'),
-	UploadMiddleware.uploadSingleVideo('in_action_video'),
 	ValidationMiddleware.validateRequest(EventValidator.joinEvent),
 	ParticipationController.joinEvent
 );
@@ -62,5 +62,6 @@ router.delete(
 router.get('/', AuthMiddleware.authenticateAdmin, EventController.getAll);
 router.get('/ongoing-event', EventController.getOngoingEvent);
 router.get('/:eventId', EventController.getOne);
+router.get('/:eventId/participants', ParticipationController.getAllParticipationOfEvent);
 
 export default router;

@@ -1,5 +1,5 @@
-import express from "express"
-import bootstrap from "./startup/bootstrap"
-const app = express()
+import Server from './startup/bootstrap';
+import { config } from './utils/config';
 
-bootstrap(app)
+const server = new Server(config.APP_NAME, config.HOST, config.PORT);
+server.start();

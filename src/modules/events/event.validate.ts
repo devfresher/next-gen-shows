@@ -39,6 +39,11 @@ export default class EventValidator {
 				then: Joi.string().uri().trim().label('Portfolio'),
 				otherwise: Joi.forbidden(),
 			}),
+			talentId: Joi.objectId().trim().required().label('Talent'),
+			inActionVideo: Joi.object({
+				videoId: Joi.string().trim().label('Video ID'),
+				url: Joi.string().uri().trim().label('URL'),
+			}).label('In Action Video'),
 			phoneNumber: Joi.when('useAsOnProfile', {
 				is: false,
 				then: Joi.string()
@@ -49,16 +54,6 @@ export default class EventValidator {
 					.messages({
 						'string.pattern.base': 'Invalid phone number',
 					}),
-				otherwise: Joi.forbidden(),
-			}),
-			talentId: Joi.when('useAsOnProfile', {
-				is: false,
-				then: Joi.string().required().trim().label('Talent/Skill'),
-				otherwise: Joi.forbidden(),
-			}),
-			countryId: Joi.when('useAsOnProfile', {
-				is: false,
-				then: Joi.string().trim().required().label('Country'),
 				otherwise: Joi.forbidden(),
 			}),
 		});

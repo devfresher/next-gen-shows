@@ -43,11 +43,27 @@ export interface UpdateUserInput {
 	password?: string;
 	phoneNumber?: string;
 	emailVerified?: boolean;
+	isActive?: boolean;
 	reason?: string;
-	country?: string;
+	country?: ID;
 	city?: string;
 	isOnboard?: boolean;
+	validId?: string;
+	idNumber?: string;
 	profileImage?: ImageFile;
+}
+
+export interface OnboardData {
+	firstName: string;
+	lastName: string;
+	stageName: string;
+	portfolio: string;
+	talentId: ID;
+	reason: string;
+	countryId: ID;
+	city: string;
+	idNumber: string;
+	validId: string;
 }
 
 export interface Voter {

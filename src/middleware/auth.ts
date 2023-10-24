@@ -1,10 +1,9 @@
-import jwt from 'jsonwebtoken';
+import jwt, { JwtPayload } from 'jsonwebtoken';
 import { NextFunction, Request, Response } from 'express';
 
 import { config } from '../utils/config';
 import UserService from '../modules/user/user.service';
 import { BadRequestError, ForbiddenError, SystemError, UnauthorizedError } from '../errors';
-import { CustomJwtPayload } from '../types/custom';
 
 export default class AuthMiddleware {
 	public static async authenticateToken(req: Request, res: Response, next: NextFunction) {
@@ -14,7 +13,7 @@ export default class AuthMiddleware {
 
 			if (!token) throw new BadRequestError('No auth token provided');
 
-			const decodedToken = jwt.verify(token, config.JWT_PRIVATE_KEY) as CustomJwtPayload;
+			const decodedToken = jwt.verify(token, config.JWT_PRIVATE_KEY) as JwtPayload;
 			const user = await UserService.getOne({
 				_id: decodedToken._id,
 			});

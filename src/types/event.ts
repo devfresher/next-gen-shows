@@ -41,7 +41,6 @@ export interface JoinEventInput {
 	phoneNumber: string;
 	category: string;
 	portfolio: string;
-	videoFile?: Express.Multer.File;
-	countryId: ID;
 	talentId: ID;
+	inActionVideo?: VideoUploadResponse;
 }

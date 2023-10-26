@@ -29,7 +29,12 @@ export default class UserService {
 	}
 
 	static async getUserProfile(userId: string): Promise<any> {
-		const user = await this.getOne({ _id: userId }, true);
+		const user = await (
+			await this.getOne({ _id: userId }, true)
+		).populate([
+			{ path: 'talent', select: '_id name' },
+			{ path: 'country', select: '_id name' },
+		]);
 		if (!user) throw new NotFoundError('User does not exist');
 
 		const stats = await ParticipationService.getParticipantStats(user._id);

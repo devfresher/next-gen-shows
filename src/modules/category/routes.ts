@@ -30,7 +30,7 @@ router.delete(
 	CategoryController.deleteCategory
 );
 
-router.get('/', AuthMiddleware.authenticateAdmin, CategoryController.getAll);
+router.get('/', CategoryController.getAll);
 router.get('/:categoryId', CategoryController.get);
 router.get('/:categoryId/participants', ParticipationController.getAllParticipationOfCategory);
 router.get(

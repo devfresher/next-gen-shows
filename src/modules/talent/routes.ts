@@ -29,7 +29,7 @@ router.delete(
 	TalentController.deleteTalent
 );
 
-router.get('/', AuthMiddleware.authenticateAdmin, TalentController.getAll);
+router.get('/', TalentController.getAll);
 router.get('/:talentId', TalentController.getOne);
 
 export default router;

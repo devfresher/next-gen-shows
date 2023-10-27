@@ -265,12 +265,18 @@ export default class ParticipationService {
 		await CategoryService.exist(categoryId);
 		await UserService.exist(participantId);
 
-		const participation = await ParticipationService.getOne({
+		let participation = await ParticipationService.getOne({
 			category: categoryId,
 			user: participantId,
 		});
-		if (!participation) throw new NotFoundError('User is not a participant of the event');
-		const { _id, user: participant, ...otherData } = participation.toObject();
+
+		if (!participation)
+			throw new NotFoundError('User is not a participant of the event category');
+		const {
+			_id,
+			user: participant,
+			...otherData
+		} = (await participation.populate(['user', 'category'])).toObject();
 
 		const votes = await this.countParticipantVotes(participantId, categoryId);
 

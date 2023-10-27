@@ -14,32 +14,28 @@ import { NotFoundError } from '../errors';
 
 export default class Server {
 	private app: Express;
-	private port: number;
-	private name: string;
-	private host: string;
 	private db: Connection;
 	private corsOptions: CorsOptions;
 
-	constructor(name: string, host: string, port: number) {
+	constructor(private name: string, private host: string, private port: number = 3000) {
 		this.app = express();
-		this.name = name;
-		this.host = host;
-		this.port = port || 3000;
 		this.corsOptions = {
 			origin: '*',
 			methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
 		};
 
 		logger();
-		this.db = connectDB();
-		this.initializeMiddlewaresAndRoutes();
-
-		['SIGINT', 'SIGUSR1', 'SIGUSR2', 'uncaughtException', 'SIGTERM'].forEach((signal) => {
-			process.on(signal, async (err) => {
-				if (err) winston.error(`${signal}: Error bootstrapping application`, err);
-				this.db.close(() => {
-					winston.info('MongoDB connection closed due to app termination');
-					process.exit(0);
+		connectDB().then((connection) => {
+			this.db = connection;
+			this.initializeMiddlewaresAndRoutes();
+	
+			['SIGINT', 'SIGUSR1', 'SIGUSR2', 'uncaughtException', 'SIGTERM'].forEach((signal) => {
+				process.on(signal, async (err) => {
+					if (err) winston.error(`${signal}: Error bootstrapping application`, err);
+					this.db.close(() => {
+						winston.info('MongoDB connection closed due to app termination');
+						process.exit(0);
+					});
 				});
 			});
 		});

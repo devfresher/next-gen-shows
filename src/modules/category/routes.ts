@@ -33,13 +33,18 @@ router.delete(
 router.get('/', CategoryController.getAll);
 router.get('/:categoryId', CategoryController.get);
 router.get('/:categoryId/participants', ParticipationController.getAllParticipationOfCategory);
+router.patch(
+	'/:categoryId/shortlist/:participantId',
+	AuthMiddleware.authenticateAdmin,
+	ParticipationController.markAsShortlisted
+);
+router.get(
+	'/:categoryId/participants/shortlisted',
+	ParticipationController.getShortlistedParticipationOfCategory
+);
 router.get(
 	'/:categoryId/participants/:participantId',
 	ParticipationController.getSingleParticipant
-);
-router.get(
-	'/:categoryId/shortlisted-1',
-	ParticipationController.getShortlistedParticipationOfCategory
 );
 router.get('/event/:eventId', CategoryController.getAllEventCategories);
 

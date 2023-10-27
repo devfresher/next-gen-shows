@@ -34,6 +34,10 @@ router.get('/', CategoryController.getAll);
 router.get('/:categoryId', CategoryController.get);
 router.get('/:categoryId/participants', ParticipationController.getAllParticipationOfCategory);
 router.get(
+	'/:categoryId/participants/:participantId',
+	ParticipationController.getSingleParticipant
+);
+router.get(
 	'/:categoryId/shortlisted-1',
 	ParticipationController.getShortlistedParticipationOfCategory
 );

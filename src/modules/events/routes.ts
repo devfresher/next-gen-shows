@@ -4,10 +4,8 @@ import ValidationMiddleware from '../../middleware/validate';
 import AuthMiddleware from '../../middleware/auth';
 import EventValidator from './event.validate';
 import EventController from './event.controller';
-import UploadMiddleware from '../../middleware/fileUpload';
 import ParticipationController from '../participation/participation.controller';
 import VotingController from '../voting/voting.controller';
-import CategoryController from '../category/category.controller';
 
 const router = Router();
 

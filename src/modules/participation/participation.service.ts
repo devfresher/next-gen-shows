@@ -266,7 +266,7 @@ export default class ParticipationService {
 		await UserService.exist(participantId);
 
 		const participation = await ParticipationService.getOne({
-			event: categoryId,
+			category: categoryId,
 			user: participantId,
 		});
 		if (!participation) throw new NotFoundError('User is not a participant of the event');

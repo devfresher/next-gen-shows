@@ -34,3 +34,5 @@ export enum Status {
 	confirmed = 'Confirmed',
 	joined = 'Joined',
 }
+
+export type ValidStage = 1 | 2 | 3;

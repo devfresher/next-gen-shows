@@ -4,7 +4,7 @@ import PaystackUtil from '../../utils/PaystackUtil';
 import { config } from '../../utils/config';
 import { PageFilter } from '../../types/general';
 import { JoinEventInput } from '../../types/event';
-import { MetaData } from '../../types/participation';
+import { MetaData, ValidStage } from '../../types/participation';
 
 export default class ParticipationController {
 	static async getAllParticipant(req: Request, res: Response, next: NextFunction) {
@@ -68,18 +68,19 @@ export default class ParticipationController {
 		next: NextFunction
 	) {
 		try {
-			const { categoryId } = req.params;
+			const { categoryId, stage } = req.params;
 			const { page, limit } = req.query;
 
 			const pageFilter: PageFilter = { page: Number(page), limit: Number(limit) };
 			const participantResult =
 				await ParticipationService.getShortlistedParticipantOfCategory(
 					categoryId,
-					pageFilter
+					pageFilter,
+					stage as unknown as ValidStage
 				);
 
 			res.status(200).json({
-				message: 'Shortlisted Participants retrieved successfully',
+				message: `Stage${stage} shortlisted Participants retrieved successfully`,
 				data: participantResult,
 			});
 		} catch (error) {
@@ -108,16 +109,19 @@ export default class ParticipationController {
 
 	static async markAsShortlisted(req: Request, res: Response, next: NextFunction) {
 		try {
-			const { categoryId } = req.params;
-			const { participantId } = req.params;
+			const {
+				params: { categoryId, participantId },
+				body: { stage },
+			} = req;
 
 			const participant = await ParticipationService.shortlistParticipant(
 				categoryId,
-				participantId
+				participantId,
+				stage
 			);
 
 			res.status(200).json({
-				message: 'Participant shortlisted successfully',
+				message: `Participant shortlisted for stage${stage} successfully`,
 				data: participant,
 			});
 		} catch (error) {

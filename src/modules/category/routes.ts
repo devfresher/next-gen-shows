@@ -36,10 +36,11 @@ router.get('/:categoryId/participants', ParticipationController.getAllParticipat
 router.patch(
 	'/:categoryId/shortlist/:participantId',
 	AuthMiddleware.authenticateAdmin,
+	ValidationMiddleware.validateRequest(CategoryValidator.markShortlist),
 	ParticipationController.markAsShortlisted
 );
 router.get(
-	'/:categoryId/participants/shortlisted',
+	'/:categoryId/participants/shortlisted/:stage',
 	ParticipationController.getShortlistedParticipationOfCategory
 );
 router.get(

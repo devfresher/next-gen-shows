@@ -1,7 +1,7 @@
 import { BadRequestError, ConflictError, NotFoundError } from '../../errors';
 import { JoinEventInput } from '../../types/event';
 import { FilterQuery, ID, PageFilter } from '../../types/general';
-import { Participation, Status } from '../../types/participation';
+import { Participation, Status, ValidStage } from '../../types/participation';
 import CloudinaryUtil from '../../utils/CloudinaryUtil';
 import cloud from 'cloudinary';
 
@@ -205,12 +205,13 @@ export default class ParticipationService {
 
 	public static async getShortlistedParticipantOfCategory(
 		categoryId: ID,
-		pageFilter: PageFilter
+		pageFilter: PageFilter,
+		stage: ValidStage
 	): Promise<any> {
 		await CategoryService.exist(categoryId);
 
 		const { data, paging } = await this.getMany(
-			{ category: categoryId, status: 'Shortlisted' },
+			{ category: categoryId, status: 'Shortlisted', stage },
 			pageFilter
 		);
 		const participationData = data as Participation[];
@@ -261,7 +262,7 @@ export default class ParticipationService {
 		return { data: allParticipation, paging };
 	}
 
-	public static async getSingleParticipant(categoryId: ID, participantId: ID): Promise<any> {
+	public static async getSingleParticipant(categoryId: ID, participantId: ID) {
 		await CategoryService.exist(categoryId);
 		await UserService.exist(participantId);
 
@@ -272,11 +273,23 @@ export default class ParticipationService {
 
 		if (!participation)
 			throw new NotFoundError('User is not a participant of the event category');
+
 		const {
 			_id,
 			user: participant,
 			...otherData
-		} = (await participation.populate(['user', 'category'])).toObject();
+		} = (
+			await participation.populate([
+				'user',
+				{
+					path: 'category',
+					populate: [
+						{ path: 'talent', select: '_id, name' },
+						{ path: 'country', select: '_id, name' },
+					],
+				},
+			])
+		).toObject();
 
 		const votes = await this.countParticipantVotes(participantId, categoryId);
 
@@ -288,7 +301,8 @@ export default class ParticipationService {
 
 	public static async shortlistParticipant(
 		categoryId: ID,
-		participantId: ID
+		participantId: ID,
+		stage: ValidStage
 	): Promise<Participation> {
 		await CategoryService.exist(categoryId);
 		await UserService.exist(participantId);
@@ -296,6 +310,7 @@ export default class ParticipationService {
 		const participation = await ParticipationService.getOne({
 			category: categoryId,
 			user: participantId,
+			stage,
 		});
 
 		if (!participation) throw new NotFoundError('User is not a participant of the event');

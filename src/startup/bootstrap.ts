@@ -28,12 +28,16 @@ export default class Server {
 		connectDB().then((connection) => {
 			this.db = connection;
 			this.initializeMiddlewaresAndRoutes();
-	
+
 			['SIGINT', 'SIGUSR1', 'SIGUSR2', 'uncaughtException', 'SIGTERM'].forEach((signal) => {
 				process.on(signal, async (err) => {
-					if (err) winston.error(`${signal}: Error bootstrapping application`, err);
+					if (err)
+						winston.error(
+							`${signal}: Application shutting down due to an unhandled error`,
+							err
+						);
 					this.db.close(() => {
-						winston.info('MongoDB connection closed due to app termination');
+						winston.info('MongoDB connection closed');
 						process.exit(0);
 					});
 				});

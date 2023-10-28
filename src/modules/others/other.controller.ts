@@ -1,16 +1,46 @@
 import { NextFunction, Request, Response } from 'express';
 import OtherService from './other.service';
-import { BadRequestError } from '../../errors';
+import SettingModel from '../../db/models/setting.model';
 
 export default class OtherController {
 	static async submitContactForm(req: Request, res: Response, next: NextFunction) {
 		try {
 			const eventData = req.body;
-			console.log(eventData);
 
 			await OtherService.processContactForm(eventData);
 			res.status(201).json({
 				message: 'Contact message submitted successfully',
+			});
+		} catch (error) {
+			next(error);
+		}
+	}
+
+	static async updateActiveStage(req: Request, res: Response, next: NextFunction) {
+		try {
+			const {
+				body: { stage },
+			} = req;
+
+			await SettingModel.updateOne(
+				{ key: 'activeStage' },
+				{ value: stage },
+				{ upsert: true }
+			);
+			res.status(201).json({
+				message: `Stage ${stage} is currently active`,
+			});
+		} catch (error) {
+			next(error);
+		}
+	}
+
+	static async getActiveStage(req: Request, res: Response, next: NextFunction) {
+		try {
+			const setting = await SettingModel.findOne({ key: 'activeStage' });
+			res.status(201).json({
+				message: `Current stage retrieved`,
+				data: setting?.value || 1,
 			});
 		} catch (error) {
 			next(error);

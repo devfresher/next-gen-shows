@@ -14,6 +14,13 @@ router.post(
 	OtherController.submitContactForm
 );
 
+router.get('/settings/active-stage', OtherController.getActiveStage);
+router.put(
+	'/settings/active-stage',
+	ValidationMiddleware.validateRequest(OtherValidator.activeStage),
+	OtherController.updateActiveStage
+);
+
 router.post(
 	'/upload-video',
 	AuthMiddleware.authenticateToken,

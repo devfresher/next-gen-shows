@@ -310,7 +310,6 @@ export default class ParticipationService {
 		const participation = await ParticipationService.getOne({
 			category: categoryId,
 			user: participantId,
-			stage,
 		});
 
 		if (!participation) throw new NotFoundError('User is not a participant of the event');
@@ -318,6 +317,8 @@ export default class ParticipationService {
 			throw new ConflictError('Participant is already shortlisted');
 
 		participation.status = Status.shortlisted;
+		participation.stage = stage;
+
 		await participation.save();
 		return participation;
 	}

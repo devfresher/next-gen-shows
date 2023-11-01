@@ -1,5 +1,4 @@
-import { Document, Types } from 'mongoose';
-import { Event } from './event';
+import { Document } from 'mongoose';
 import { User } from './user';
 import { ID } from './general';
 import { Category } from './category';
@@ -12,6 +11,7 @@ export interface Participation extends Document {
 	paymentRef: string;
 	createdAt: Date;
 	status: Status;
+	stage: ValidStage;
 }
 
 export interface MetaData {

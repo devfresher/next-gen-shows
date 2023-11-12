@@ -69,12 +69,13 @@ export default class ParticipationController {
 	) {
 		try {
 			const { categoryId, stage } = req.params;
-			const { page, limit } = req.query;
+			const { page, limit, search } = req.query;
 
 			const pageFilter: PageFilter = { page: Number(page), limit: Number(limit) };
 			const participantResult =
 				await ParticipationService.getShortlistedParticipantOfCategory(
 					categoryId,
+					search as string,
 					pageFilter,
 					stage as unknown as ValidStage
 				);

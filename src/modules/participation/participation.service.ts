@@ -205,15 +205,15 @@ export default class ParticipationService {
 
 	public static async getShortlistedParticipantOfCategory(
 		categoryId: ID,
+		searchText: string,
 		pageFilter: PageFilter,
 		stage: ValidStage
 	): Promise<any> {
 		await CategoryService.exist(categoryId);
+		const query: FilterQuery = { category: categoryId, status: 'Shortlisted', stage };
 
-		const { data, paging } = await this.getMany(
-			{ category: categoryId, status: 'Shortlisted', stage },
-			pageFilter
-		);
+		if (searchText) query.user.username = searchText;
+		const { data, paging } = await this.getMany(query, pageFilter);
 		const participationData = data as Participation[];
 
 		const participationPromise = participationData.map(async (participation) => {

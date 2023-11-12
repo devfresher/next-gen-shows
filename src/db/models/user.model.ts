@@ -15,6 +15,7 @@ const userSchema = new mongoose.Schema({
 	},
 	stageName: {
 		type: String,
+		unique: true,
 	},
 	talent: { type: Types.ObjectId, ref: 'Talent' },
 	portfolio: { type: String },

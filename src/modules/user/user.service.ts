@@ -111,6 +111,9 @@ export default class UserService {
 		await TalentService.exist(talentId);
 		await CountryService.exist(countryId);
 
+		const stageNameExist = await this.getOne({ stageName });
+		if (stageNameExist) throw new BadRequestError('Stage name already chosen');
+
 		const updateData: UpdateUserInput = {
 			firstName,
 			lastName,

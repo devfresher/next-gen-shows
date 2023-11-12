@@ -54,12 +54,16 @@ export default class CategoryController {
 		try {
 			const {
 				params: { eventId },
-				query: { page, limit },
+				query: { page, limit, country, talent },
 			} = req;
 			const pageFilter: PageFilter = { page: Number(page), limit: Number(limit) };
 
 			await EventService.exist(eventId);
-			const categories = await CategoryService.getMany({ event: eventId }, pageFilter);
+			const query: FilterQuery = { event: eventId };
+
+			if (country) query.country = country;
+			if (talent) query.talent = talent;
+			const categories = await CategoryService.getMany(query, pageFilter);
 
 			res.status(200).json({
 				message: 'All event categories retrieved successfully',

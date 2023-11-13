@@ -28,13 +28,7 @@ export default class UserValidator {
 			firstName: Joi.string().trim().label('First Name'),
 			lastName: Joi.string().trim().label('Last Name'),
 			stageName: Joi.string().trim().label('Stage Name'),
-			phoneNumber: Joi.string()
-				.regex(/^(\+?234|0)[\d]{10}$/)
-				.trim()
-				.label('Phone Number')
-				.messages({
-					'string.pattern.base': 'Invalid phone number',
-				}),
+			phoneNumber: Joi.string().trim().label('Phone Number'),
 			profileImage: Joi.object({
 				imageId: Joi.string().trim().label('Image ID'),
 				url: Joi.string().uri().trim().label('URL'),

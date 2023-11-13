@@ -46,14 +46,7 @@ export default class EventValidator {
 			}).label('In Action Video'),
 			phoneNumber: Joi.when('useAsOnProfile', {
 				is: false,
-				then: Joi.string()
-					.regex(/^(\+?234|0)[\d]{10}$/)
-					.trim()
-					.required()
-					.label('Phone Number')
-					.messages({
-						'string.pattern.base': 'Invalid phone number',
-					}),
+				then: Joi.string().trim().required().label('Phone Number'),
 				otherwise: Joi.forbidden(),
 			}),
 		});
@@ -66,14 +59,7 @@ export default class EventValidator {
 			numberOfVotes: Joi.number().required().label('Number of votes'),
 			fullName: Joi.string().trim().label('Full Name'),
 			email: Joi.string().email().required().trim().lowercase().label('Email Address'),
-			phoneNumber: Joi.string()
-				.regex(/^(\+?234|0)[\d]{10}$/)
-				.trim()
-				.required()
-				.label('Phone Number')
-				.messages({
-					'string.pattern.base': 'Invalid phone number',
-				}),
+			phoneNumber: Joi.string().trim().required().label('Phone Number'),
 		});
 
 		return validationSchema.validate(req.body, options);

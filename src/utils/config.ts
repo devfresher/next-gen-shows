@@ -13,7 +13,7 @@ export const config = {
 	APP_LOGO: 'https://',
 	HOST: process.env.HOST,
 	PORT: process.env.PORT as unknown as number,
-	BASE_URL: `${process.env.HOST}`,
+	BASE_URL: `${process.env.BASE_URL}`,
 
 	REDIS_HOST: process.env.REDIS_HOST,
 	REDIS_PORT: Number(process.env.REDIS_PORT),
@@ -43,6 +43,6 @@ export const config = {
 		client_id: process.env.GOOGLE_AUTH_CLIENT_ID,
 		client_secret: process.env.GOOGLE_AUTH_CLIENT_SECRET,
 		refresh_token: process.env.GOOGLE_AUTH_REFRESH_TOKEN,
-		redirect_url: `${process.env.HOST}/api/admin/dev/auth/google/callback`,
+		redirect_url: `${process.env.BASE_URL}/api/admin/dev/auth/google/callback`,
 	},
 };

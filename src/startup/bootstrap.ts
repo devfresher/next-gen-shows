@@ -63,7 +63,7 @@ export default class Server {
 
 	start() {
 		this.app.listen(this.port, () => {
-			winston.info(`${this.name}'s Server started at http://${this.host}:${this.port}`);
+			winston.info(`${this.name}'s Server started at ${this.host}:${this.port}`);
 		});
 	}
 }

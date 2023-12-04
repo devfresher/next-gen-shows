@@ -212,7 +212,7 @@ export default class ParticipationService {
 		await CategoryService.exist(categoryId);
 		const query: FilterQuery = { category: categoryId, status: 'Shortlisted', stage };
 
-		if (searchText) query.user.stageName = searchText;
+		if (searchText) query.userStageName = searchText;
 		const { data, paging } = await this.getMany(query, pageFilter);
 		const participationData = data as Participation[];
 
